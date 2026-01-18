@@ -1,0 +1,88 @@
+# Advanced RAG System Configuration
+
+model:
+  # Embedding model (small, fast, good quality)
+  embedding: "BAAI/bge-small-en-v1.5"
+  embedding_dim: 384
+  
+  # LLM configuration
+  llm_provider: "groq"  # groq | ollama
+  llm_model: "llama-3.1-8b-instant"
+  llm_temperature: 0.2
+  llm_max_tokens: 2048
+  
+  # Device settings
+  device: "cpu"  # cuda | cpu (use cpu if CUDA not available)
+  use_fp16: true
+  
+search:
+  # Chunking
+  chunk_size: 1000
+  chunk_overlap: 200
+  
+  # Retrieval
+  top_k: 5
+  top_k_rerank: 10
+  
+  # Hybrid search defaults
+  semantic_weight: 0.5
+  lexical_weight: 0.5
+  
+  # RRF fusion parameter
+  rrf_k: 60
+  
+cache:
+  enabled: true
+  similarity_threshold: 0.95
+  max_items: 100
+  ttl_seconds: 3600
+  
+memory:
+  # RAM limits (16GB system, use max 12GB)
+  max_ram_gb: 12.0
+  ram_cleanup_threshold: 0.80
+  
+  # VRAM limits (6GB GPU, use max 4.8GB = 80%)
+  max_vram_gb: 4.8
+  vram_cleanup_threshold: 0.85
+  
+  # Batch processing
+  embedding_batch_size: 32
+  
+logging:
+  level: "INFO"
+  format: "{time} | {level} | {message}"
+  
+paths:
+  documents: "data/documents"
+  embeddings: "data/embeddings"
+  cache: "data/cache"
+  graphs: "data/graphs"
+  exports: "data/exports"
+
+# Story Mode Configuration
+story:
+  mode: "dual"  # "document_only", "story_only", "dual"
+  
+# Graph RAG Configuration
+graph_rag:
+  enable_graph: true
+  graph_backend: "networkx"
+  max_hops: 3
+  min_relationship_strength: 0.3
+  
+  entity_extraction:
+    spacy_model: "en_core_web_sm"
+    custom_labels:
+      - CHARACTER
+      - LOCATION
+      - EVENT
+      - THEME
+      - ARTIFACT
+      - FACTION
+      
+  arc_tracking:
+    enable: true
+    transition_threshold: 0.4
+    max_timeline_length: 100
+

@@ -1,0 +1,2 @@
+"""Test core module init"""
+
