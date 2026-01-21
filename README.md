@@ -3,6 +3,7 @@
 A production-ready Retrieval-Augmented Generation platform with two powerful modes:
 - **📄 Document Analyzer** - Hybrid search RAG for document Q&A
 - **✍️ StoryWeaver** - Comparative story generation with Graph RAG
+- **🧪 A/B Test Meta-Analysis** - Statistical aggregation of experiment results
 
 Optimized for consumer hardware (16GB RAM + 6GB VRAM).
 
@@ -35,6 +36,14 @@ Optimized for consumer hardware (16GB RAM + 6GB VRAM).
 - **LLM Routing**: Groq (primary) + Ollama (fallback)
 - **Memory Optimized**: 16GB RAM + RTX 4050 (6GB VRAM)
 - **SpaCy NER**: Entity and relationship extraction
+
+### 🧪 A/B Test Meta-Analysis Mode
+- **Multi-Source Ingestion**: Unified parsing for Kaggle, Custom CSV, and Excel
+- **Synthetic Data**: AI-powered data generation (CTGAN) for simulation
+- **Statistical Engine**: Random-effects / Fixed-effects modeling
+- **Bias Detection**: Egger's regression test + Funnel plots
+- **AI Insights**: LLM-driven interpretation of statistical results
+- **Data Management**: "Clear All Data" feature for workspace reset
 
 ---
 
@@ -76,6 +85,11 @@ streamlit run src/ui/pages/document_app.py
 streamlit run src/ui/pages/story_app.py
 ```
 
+**Meta-Analysis Engine Only:**
+```bash
+streamlit run src/ui/pages/meta_analysis_app.py
+```
+
 **FastAPI REST:**
 ```bash
 uvicorn src.api.fastapi_app:app --reload
@@ -99,6 +113,24 @@ Open http://localhost:8000/docs
 2. Click "Process Documents"
 3. Ask questions in chat
 4. Rate responses for weight adaptation
+
+### Meta-Analysis Engine
+
+**Multiple ways to get data:**
+1. **📁 Upload Files**: Drag & drop CSV or Excel files (Sidebar).
+   - Supported cols: `control_conversions`, `control_total`, `treatment_conversions`, `treatment_total`.
+2. **🧪 Synthesize Data**: Generate realistic simulation data using CTGAN/CopulaGAN models.
+3. **🌐 Import from Kaggle**: Download real datasets directly (e.g., "marketing-ab-testing").
+4. **📚 Sample Datasets**: One-click load of pre-built examples for learning.
+
+**Analysis Steps:**
+1. Load data using one of the methods above.
+2. The **MCP Server** automatically parses and harmonizes the data.
+3. View the **Forest Plot** and statistics.
+4. Switch to **Simple View** for a plain-English summary ("Did the variant win?").
+5. Use "🗑️ Clear All Data" in the sidebar to reset the workspace.
+
+> **Tip:** For a beginner-friendly guide to all features and statistics, see [feature3_meta_analysis_explained.txt](feature3_meta_analysis_explained.txt).
 
 ### Python SDK
 

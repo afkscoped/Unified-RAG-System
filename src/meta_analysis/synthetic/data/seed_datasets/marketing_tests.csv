@@ -1,0 +1,51 @@
+experiment_id,experiment_name,variant,control_visitors,control_conversions,variant_visitors,variant_conversions,test_duration_days,platform,ctr,cpa,ad_format,audience_segment,time_of_day
+campaign_mkt_0001,Summer Sale Ad,A/B,150000,3000,155000,3410,7,facebook,0.020,15.50,display,broad,morning
+creative_mkt_0002,Video vs Image,A/B,85000,4250,86000,4730,14,instagram,0.050,12.20,video,interest,evening
+targeting_mkt_0003,Lookalike 1% vs 3%,A/B,200000,4000,195000,4290,10,facebook,0.020,22.10,native,lookalike,afternoon
+bidding_mkt_0004,Auto vs Manual Bid,A/B,120000,2400,125000,2750,7,google,0.020,35.40,search,retargeting,morning
+placement_mkt_0005,Feed vs Story,A/B,95000,2850,94000,3290,7,instagram,0.030,18.90,display,interest,night
+campaign_mkt_0006,Email Subject Line,A/B,50000,7500,51000,8670,3,email,0.150,5.00,native,broad,morning
+creative_mkt_0007,Carousel Ad,A/B,110000,3300,112000,3696,14,facebook,0.030,14.80,display,interest,afternoon
+targeting_mkt_0008,Geo-targeting,A/B,180000,3600,185000,4070,21,google,0.020,25.60,display,broad,evening
+bidding_mkt_0009,tCPA vs Max Conv,A/B,140000,4200,138000,4554,14,google,0.030,28.20,search,retargeting,night
+placement_mkt_0010,Desktop vs Mobile,A/B,250000,2500,245000,2940,7,google,0.010,45.00,display,broad,morning
+campaign_mkt_0011,Flash Sale,A/B,300000,9000,310000,10230,2,tiktok,0.030,8.50,video,interest,evening
+creative_mkt_0012,UGC vs Studio,A/B,100000,4000,105000,4620,14,tiktok,0.040,10.10,video,lookalike,afternoon
+targeting_mkt_0013,Interest Stacking,A/B,160000,3200,155000,3410,7,facebook,0.020,20.50,display,interest,night
+bidding_mkt_0014,Cost Cap,A/B,135000,2700,130000,2860,10,facebook,0.020,21.80,display,retargeting,morning
+placement_mkt_0015,Sidebar vs Banner,A/B,220000,1100,215000,1290,21,google,0.005,30.00,display,broad,afternoon
+campaign_mkt_0016,Retargeting Sequ,A/B,80000,2400,82000,2706,14,facebook,0.030,19.20,video,retargeting,evening
+creative_mkt_0017,Short vs Long Copy,A/B,125000,3750,120000,3840,7,instagram,0.030,16.50,display,lookalike,night
+targeting_mkt_0018,Age Groups,A/B,190000,3800,195000,4290,14,tiktok,0.020,11.30,video,broad,morning
+bidding_mkt_0019,ROAS Goal,A/B,150000,4500,155000,4960,21,google,0.030,42.10,search,interest,afternoon
+placement_mkt_0020,In-Stream vs Dis,A/B,280000,5600,275000,6050,14,youtube,0.020,15.80,video,broad,evening
+campaign_mkt_0021,Holiday Promo,A/B,350000,10500,360000,11880,5,facebook,0.030,13.20,display,interest,night
+creative_mkt_0022,Animation,A/B,90000,2700,92000,3036,10,instagram,0.030,17.40,video,lookalike,morning
+targeting_mkt_0023,Competitor Kw,A/B,60000,1800,62000,2046,14,google,0.030,55.00,search,retargeting,afternoon
+bidding_mkt_0024,Maximize Clicks,A/B,170000,1700,175000,2100,7,google,0.010,12.50,display,broad,evening
+placement_mkt_0025,Home Feed,A/B,210000,6300,205000,6765,14,tiktok,0.030,9.00,video,interest,night
+campaign_mkt_0026,Winback,A/B,75000,2250,78000,2574,10,email,0.030,4.50,native,retargeting,morning
+creative_mkt_0027,Influencer,A/B,130000,5200,135000,6240,14,instagram,0.040,14.30,video,lookalike,afternoon
+targeting_mkt_0028,Behavioral,A/B,145000,2900,150000,3300,14,facebook,0.020,23.40,display,interest,evening
+bidding_mkt_0029,Lowest Cost,A/B,115000,2300,110000,2420,7,facebook,0.020,19.50,display,broad,night
+placement_mkt_0030,Audience Network,A/B,240000,2400,235000,2585,14,facebook,0.010,8.20,native,broad,morning
+campaign_mkt_0031,Brand Awareness,A/B,400000,2000,410000,2460,21,youtube,0.005,2.50,video,broad,afternoon
+creative_mkt_0032,Testimonial,A/B,105000,3150,108000,3564,14,facebook,0.030,18.70,display,retargeting,evening
+targeting_mkt_0033,Device Model,A/B,165000,3300,170000,3740,14,google,0.020,32.00,display,interest,night
+bidding_mkt_0034,Impression Share,A/B,125000,1250,130000,1430,7,google,0.010,50.00,search,broad,morning
+placement_mkt_0035,Explore Page,A/B,200000,6000,195000,6435,14,instagram,0.030,13.80,display,lookalike,afternoon
+campaign_mkt_0036,App Install,A/B,185000,9250,190000,10175,14,facebook,0.050,4.20,video,broad,evening
+creative_mkt_0037,Product Demo,A/B,118000,4720,122000,5368,14,tiktok,0.040,8.90,video,interest,night
+targeting_mkt_0038,Custom Audience,A/B,95000,2850,98000,3234,10,facebook,0.030,16.20,display,retargeting,morning
+bidding_mkt_0039,Manual CPC,A/B,148000,4440,152000,4864,14,google,0.030,22.50,search,interest,afternoon
+placement_mkt_0040,Video Feeds,A/B,260000,5200,255000,5610,14,facebook,0.020,11.50,video,broad,evening
+campaign_mkt_0041,Lead Gen,A/B,65000,1300,68000,1496,14,linkedin,0.020,45.00,native,interest,night
+creative_mkt_0042,Infographic,A/B,72000,1440,75000,1650,14,linkedin,0.020,38.50,display,broad,morning
+targeting_mkt_0043,Job Title,A/B,55000,1100,58000,1210,21,linkedin,0.020,52.00,native,lookalike,afternoon
+bidding_mkt_0044,Enhanced CPC,A/B,132000,3960,135000,4356,14,google,0.030,29.80,search,interest,evening
+placement_mkt_0045,Search Partner,A/B,155000,1550,160000,1760,14,google,0.010,35.00,search,broad,night
+campaign_mkt_0046,Webinar Promo,A/B,45000,1350,48000,1536,10,linkedin,0.030,32.00,display,interest,morning
+creative_mkt_0047,Carousel Story,A/B,88000,3520,92000,3960,7,instagram,0.040,10.50,video,retargeting,afternoon
+targeting_mkt_0048,Exclude Audience,A/B,175000,3500,180000,3850,14,facebook,0.020,24.00,display,broad,evening
+bidding_mkt_0049,Target ROAS,A/B,142000,4260,145000,4698,21,facebook,0.030,28.50,display,lookalike,night
+placement_mkt_0050,Messenger,A/B,98000,1960,102000,2142,14,facebook,0.020,15.20,native,interest,morning

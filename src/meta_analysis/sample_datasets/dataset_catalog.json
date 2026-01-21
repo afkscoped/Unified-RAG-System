@@ -1,0 +1,90 @@
+[
+  {
+    "dataset_id": "ecom_checkout",
+    "name": "E-commerce Checkout Optimization",
+    "domain": "E-commerce",
+    "description": "Experiments testing single-page vs multi-step checkout flows.",
+    "file_path": "ecom_checkout.csv",
+    "row_count": 20
+  },
+  {
+    "dataset_id": "saas_pricing",
+    "name": "SaaS Pricing Page Tests",
+    "domain": "SaaS / Product",
+    "description": "Impact of annual vs monthly toggle placement on signups.",
+    "file_path": "saas_pricing.csv",
+    "row_count": 20
+  },
+  {
+    "dataset_id": "email_campaigns",
+    "name": "Email Subject Line CTR",
+    "domain": "Email campaigns",
+    "description": "Open rates for personalized vs generic subject lines.",
+    "file_path": "email_ctr.csv",
+    "row_count": 20
+  },
+  {
+    "dataset_id": "mobile_ux_onboarding",
+    "name": "Mobile App Onboarding Flow",
+    "domain": "Mobile UX",
+    "description": "Completion rates for tutorial vs skip-to-action onboarding.",
+    "file_path": "mobile_onboarding.csv",
+    "row_count": 20
+  },
+  {
+    "dataset_id": "healthcare_cta",
+    "name": "Healthcare Appointment Booking",
+    "domain": "Healthcare",
+    "description": "Booking rates for 'Book Now' vs 'Schedule Consultation'.",
+    "file_path": "healthcare_booking.csv",
+    "row_count": 20
+  },
+  {
+    "dataset_id": "edtech_course_enroll",
+    "name": "EdTech Course Enrollment",
+    "domain": "EdTech",
+    "description": "Enrollment rates with video trailer vs text description.",
+    "file_path": "edtech_enrollment.csv",
+    "row_count": 20
+  },
+  {
+    "dataset_id": "marketing_landing_page",
+    "name": "Landing Page Hero Image",
+    "domain": "Marketing",
+    "description": "Conversion rates for product shot vs lifestyle image.",
+    "file_path": "marketing_hero.csv",
+    "row_count": 20
+  },
+  {
+    "dataset_id": "product_feature_adoption",
+    "name": "New Feature Discovery",
+    "domain": "SaaS / Product",
+    "description": "Adoption rates with tooltip vs modal announcement.",
+    "file_path": "feature_adoption.csv",
+    "row_count": 20
+  },
+  {
+    "dataset_id": "cart_abandonment",
+    "name": "Cart Abandonment Recovery",
+    "domain": "E-commerce",
+    "description": "Recovery rates for discount code vs urgency messaging.",
+    "file_path": "cart_recovery.csv",
+    "row_count": 20
+  },
+  {
+    "dataset_id": "subscription_upsell",
+    "name": "Premium Upsell Modal",
+    "domain": "Mobile UX",
+    "description": "Upsell conversion on free tier usage limits.",
+    "file_path": "premium_upsell.csv",
+    "row_count": 20
+  },
+  {
+    "dataset_id": "geo_segmented",
+    "name": "Global vs Local Messaging",
+    "domain": "Marketing",
+    "description": "Campaign performance across different regions.",
+    "file_path": "geo_messaging.csv",
+    "row_count": 60
+  }
+]

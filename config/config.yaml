@@ -112,3 +112,27 @@ graph_rag:
       - LOCATION
       - EVENT
       - THEME
+      - THEME
+      - ARTIFACT
+      - FACTION
+      
+  arc_tracking:
+    enable: true
+    transition_threshold: 0.4
+    max_timeline_length: 100
+
+
+meta_analysis:
+  data_path: "./data/experiments"
+  archive_path: "./data/experiment_archive/archive.json"
+  methodology_docs_path: "./data/methodology_papers"
+  
+  statistical:
+    confidence_level: 0.95
+    default_model: "auto"  # fixed, random, auto
+    heterogeneity_threshold: 0.25
+  
+  rag:
+    enabled: true
+    use_historicals: true
+    use_benchmarks: true

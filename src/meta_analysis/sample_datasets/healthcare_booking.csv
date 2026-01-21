@@ -1,0 +1,21 @@
+experiment_name,control_visitors,control_conversions,variant_visitors,variant_conversions
+Healthcare Appointment Booking_Exp_1,4400,191,2899,145
+Healthcare Appointment Booking_Exp_2,2956,146,3888,213
+Healthcare Appointment Booking_Exp_3,1113,58,4802,240
+Healthcare Appointment Booking_Exp_4,3687,175,3926,203
+Healthcare Appointment Booking_Exp_5,1928,103,2678,150
+Healthcare Appointment Booking_Exp_6,3306,157,1266,67
+Healthcare Appointment Booking_Exp_7,2978,167,1673,84
+Healthcare Appointment Booking_Exp_8,2602,135,2259,105
+Healthcare Appointment Booking_Exp_9,3467,172,4998,248
+Healthcare Appointment Booking_Exp_10,1135,57,4192,217
+Healthcare Appointment Booking_Exp_11,1034,36,1913,101
+Healthcare Appointment Booking_Exp_12,1219,60,4341,220
+Healthcare Appointment Booking_Exp_13,2385,111,2838,132
+Healthcare Appointment Booking_Exp_14,3612,154,4539,231
+Healthcare Appointment Booking_Exp_15,3866,186,4171,218
+Healthcare Appointment Booking_Exp_16,4347,231,1174,57
+Healthcare Appointment Booking_Exp_17,3722,188,3963,198
+Healthcare Appointment Booking_Exp_18,2830,155,2520,129
+Healthcare Appointment Booking_Exp_19,3769,188,3876,198
+Healthcare Appointment Booking_Exp_20,1794,105,1934,98

@@ -7,6 +7,10 @@ Provides navigation to Document Analyzer and Story Mode.
 """
 
 import streamlit as st
+import sys
+import os
+# Add project root to path
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../')))
 
 st.set_page_config(
     page_title="StoryWeaver Platform",
@@ -131,6 +135,25 @@ with col3:
     st.markdown("")
     if st.button("🎭 Enter Story Mode", key="story_btn", use_container_width=True):
         st.switch_page("pages/story_app.py")
+
+with col3:
+    st.markdown("### 🧪 Meta-Analysis")
+    st.markdown("""
+    **A/B Test Engine**
+    
+    Aggregate experiments, detect bias, and find the true effect.
+    """)
+    
+    st.markdown("""
+    - 📊 **Statistical Engine**: Fixed & Random effects
+    - 🔍 **Bias Detection**: Publication bias & outliers
+    - 🧠 **AI Insights**: RAG-powered interpretation
+    - 📈 **Visualizations**: Interactive plots
+    """)
+    
+    st.markdown("")
+    if st.button("🧪 Open Meta-Analysis", key="meta_btn", use_container_width=True):
+        st.switch_page("pages/meta_analysis_app.py")
 
 # Footer section
 st.divider()
