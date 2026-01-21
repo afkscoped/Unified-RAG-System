@@ -325,6 +325,14 @@ class ConsistencyChecker:
         if not self.story_graph:
             return violations, prevented
         
+        # Simple lemmatization map for common behaviors
+        behavior_lemmas = {
+            "helped": "help", "attacked": "attack", "betrayed": "betray", 
+            "supported": "support", "fought": "fight", "embraced": "embrace",
+            "hated": "hate", "despised": "despise", "feared": "fear",
+            "trusted": "trust", "killed": "kill", "saved": "save"
+        }
+        
         # Get all established relationships
         for edge in self.story_graph.graph.edges(data=True):
             source, target = edge[0], edge[1]
@@ -340,25 +348,48 @@ class ConsistencyChecker:
             source_name = source_entity.name.lower()
             target_name = target_entity.name.lower()
             
-            # Check if both mentioned
+            # Check if both mentioned in text
             if source_name in text.lower() and target_name in text.lower():
-                # Check for behavior contradicting relationship
-                expected_behaviors = self.relationship_behaviors.get(rel_type, [])
                 conflicting_behaviors = self._get_conflicting_behaviors(rel_type)
                 
                 for behavior in conflicting_behaviors:
-                    # Check if conflicting behavior mentioned
-                    pattern = f"{source_name}.*{behavior}.*{target_name}"
-                    alt_pattern = f"{target_name}.*{behavior}.*{source_name}"
+                    # Check for behavior or its lemma
+                    lemma = behavior_lemmas.get(behavior, behavior)
                     
-                    if re.search(pattern, text.lower()) or re.search(alt_pattern, text.lower()):
-                        prevented.append(
-                            f"Prevented: {source_entity.name} {behavior} {target_entity.name} "
-                            f"(violates {rel_type} relationship)"
-                        )
+                    if lemma in text.lower():
+                        violations.append(ConsistencyViolation(
+                            type=ViolationType.RELATIONSHIP_VIOLATION,
+                            severity=ViolationSeverity.MAJOR,
+                            description=f"Behavior '{behavior}' contradicts {rel_type} between {source_entity.name} and {target_entity.name}",
+                            evidence=f"Text contains '{lemma}' while relationship is {rel_type}",
+                            suggestion=f"Adjust action to fit {rel_type} relationship",
+                            approach="graph"
+                        ))
+                        prevented.append(f"Detected conflict: {source_entity.name} vs {target_entity.name} regarding '{lemma}'")
         
         return violations, prevented
-    
+
+    def _get_conflicting_behaviors(self, rel_type: str) -> List[str]:
+        """Get behaviors that conflict with a relationship type."""
+        conflicts = {
+            "ALLIES_WITH": ["attacked", "betrayed", "abandoned", "fought against"],
+            "CONFLICTS_WITH": ["embraced", "helped", "supported", "trusted completely"],
+            "LOVES": ["hated", "despised", "couldn't stand"],
+            "FEARS": ["challenged boldly", "attacked fearlessly"]
+        }
+        return conflicts.get(rel_type, [])
+
+    def _check_knowledge_violations(
+        self,
+        text: str,
+        entities: List[Dict],
+        chapter: int
+    ) -> List[ConsistencyViolation]:
+        """Check if characters know things they shouldn't."""
+        violations = []
+        # Basic placeholder - would need knowledge tracking for full implementation
+        return violations
+
     def _check_character_state_violations(
         self,
         text: str,
@@ -377,7 +408,13 @@ class ConsistencyChecker:
                 continue
             
             latest_state = timeline[-1]
-            char_name = char_id.replace('char_', '').replace('_', ' ')
+            
+            # Get character name
+            char_name = char_id
+            if self.story_graph:
+                entity = self.story_graph.get_entity(char_id)
+                if entity:
+                    char_name = entity.name
             
             if char_name.lower() not in text.lower():
                 continue
@@ -395,13 +432,20 @@ class ConsistencyChecker:
             if emotional_state in contradicting_emotions:
                 for contradiction in contradicting_emotions[emotional_state]:
                     if contradiction in text.lower():
+                        violations.append(ConsistencyViolation(
+                            type=ViolationType.CHARACTER_STATE_VIOLATION,
+                            severity=ViolationSeverity.MAJOR,
+                            description=f"Character {char_name} acts '{contradiction}' despite being {emotional_state}",
+                            evidence=f"Text: '{contradiction}' vs State: {emotional_state}",
+                            suggestion=f"Align action with emotional state or show transition",
+                            approach="graph"
+                        ))
                         prevented.append(
-                            f"Prevented: {char_name} '{contradiction}' "
-                            f"(contradicts {emotional_state} state from arc tracker)"
+                            f"Prevented: {char_name} '{contradiction}' (contradicts {emotional_state} state)"
                         )
         
         return violations, prevented
-    
+
     def _check_location_impossibilities(
         self,
         text: str,
@@ -413,49 +457,54 @@ class ConsistencyChecker:
         if not self.story_graph:
             return violations
         
-        # Find all character-location relationships from graph
+        # 1. Get current locations of characters from Graph
         character_locations = {}
         for edge in self.story_graph.graph.edges(data=True):
             if edge[2].get('relation_type') == 'LOCATED_IN':
                 char_id = edge[0]
                 loc_id = edge[1]
+                character_locations[char_id] = loc_id
+        
+        # 2. Check text for placement of characters in DIFFERENT locations
+        # Get all location entities
+        all_locations = self.story_graph.get_entities_by_type("LOCATION")
+        loc_map = {l.name.lower(): l.id for l in all_locations}
+        
+        text_lower = text.lower()
+        
+        for char_id, current_loc_id in character_locations.items():
+            char_entity = self.story_graph.get_entity(char_id)
+            if not char_entity or char_entity.name.lower() not in text_lower:
+                continue
                 
-                if edge[2].get('temporal_context', 0) == chapter:
-                    character_locations[char_id] = loc_id
+            current_loc = self.story_graph.get_entity(current_loc_id)
+            if not current_loc:
+                continue
+                
+            # Check if text places character in a DIFFERENT location
+            for loc_name, loc_id in loc_map.items():
+                if loc_id == current_loc_id:
+                    continue
+                    
+                if loc_name in text_lower:
+                    # Heuristic check for static placement
+                    static_indicators = ["was in", "stood in", "stood at", "sat in", "at the", "inside the"]
+                    
+                    # Also check simple proximity "Marcus ... Forest"
+                    if f"{char_entity.name.lower()} was in {loc_name}" in text_lower or \
+                       f"{char_entity.name.lower()} stood in {loc_name}" in text_lower or \
+                       (loc_name in text_lower and char_entity.name.lower() in text_lower and any(ind in text_lower for ind in static_indicators)):
+                        
+                         violations.append(ConsistencyViolation(
+                            type=ViolationType.LOCATION_IMPOSSIBILITY,
+                            severity=ViolationSeverity.CRITICAL,
+                            description=f"{char_entity.name} appears to be in {loc_name.title()} but is established in {current_loc.name}",
+                            evidence=f"Text mentions '{loc_name}' and '{char_entity.name}'",
+                            suggestion=f"Move character explicitly or correct location",
+                            approach="graph"
+                        ))
         
-        # Check if character is in two places at once in the text
-        location_keywords = {}
-        for loc_id in set(character_locations.values()):
-            loc_entity = self.story_graph.get_entity(loc_id)
-            if loc_entity:
-                location_keywords[loc_id] = loc_entity.name.lower()
-        
-        # Simplified check - would need more sophisticated parsing in production
         return violations
-    
-    def _check_knowledge_violations(
-        self,
-        text: str,
-        entities: List[Dict],
-        chapter: int
-    ) -> List[ConsistencyViolation]:
-        """Check if characters know things they shouldn't."""
-        violations = []
-        
-        # This would require more sophisticated knowledge tracking
-        # Placeholder for full implementation
-        
-        return violations
-    
-    def _get_conflicting_behaviors(self, rel_type: str) -> List[str]:
-        """Get behaviors that conflict with a relationship type."""
-        conflicts = {
-            "ALLIES_WITH": ["attacked", "betrayed", "abandoned", "fought against"],
-            "CONFLICTS_WITH": ["embraced", "helped", "supported", "trusted completely"],
-            "LOVES": ["hated", "despised", "couldn't stand"],
-            "FEARS": ["challenged boldly", "attacked fearlessly"]
-        }
-        return conflicts.get(rel_type, [])
     
     def _build_report(self, violations: List[ConsistencyViolation]) -> ConsistencyReport:
         """Build consistency report from violations."""

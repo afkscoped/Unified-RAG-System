@@ -12,4 +12,7 @@ if __name__ == "__main__":
         page_icon="🧪",
         layout="wide"
     )
+    from src.ui.styles.cyberpunk_theme import load_cyberpunk_theme
+    load_cyberpunk_theme()
+    
     render_meta_analysis_page()

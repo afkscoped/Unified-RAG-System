@@ -1,0 +1,55 @@
+{
+  "feedback": [
+    {
+      "timestamp": "2026-01-21T15:31:42.822355",
+      "chapter": 1,
+      "approach": "unified",
+      "prompt": "cobb enters gob's dreams\n",
+      "ratings": {
+        "overall": 3,
+        "consistency": 2,
+        "creativity": 3,
+        "character_authenticity": 4,
+        "plot_coherence": 2
+      },
+      "comment": "",
+      "selected_best": false
+    },
+    {
+      "timestamp": "2026-01-21T15:31:51.947324",
+      "chapter": 1,
+      "approach": "graph",
+      "prompt": "cobb enters gob's dreams\n",
+      "ratings": {
+        "overall": 2,
+        "consistency": 2,
+        "creativity": 2,
+        "character_authenticity": 3,
+        "plot_coherence": 4
+      },
+      "comment": "",
+      "selected_best": false
+    },
+    {
+      "timestamp": "2026-01-21T15:31:57.870342",
+      "chapter": 1,
+      "approach": "hybrid",
+      "prompt": "cobb enters gob's dreams\n",
+      "ratings": {
+        "overall": 4,
+        "consistency": 4,
+        "creativity": 4,
+        "character_authenticity": 5,
+        "plot_coherence": 4
+      },
+      "comment": "",
+      "selected_best": false
+    }
+  ],
+  "weights": {
+    "unified": 0.31115934080893654,
+    "graph": 0.3016300859966628,
+    "hybrid": 0.3872105731944007
+  },
+  "last_updated": "2026-01-21T15:31:57.871273"
+}

@@ -1,173 +1,146 @@
-# RELOAD_FORCE: 2026-01-21 22:36
+# RELOAD_FORCE: 2026-01-22
 """
-StoryWeaver Landing Page
+Unified RAG System Landing Page
 
 Main entry point for the dual-mode platform.
-Provides navigation to Document Analyzer and Story Mode.
+Provides navigation to Document Analyzer, QLoRA Training Studio, and Story Mode.
 """
 
 import streamlit as st
 import sys
 import os
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv()
+
 # Add project root to path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../')))
 
+from src.ui.styles.cyberpunk_theme import load_cyberpunk_theme
+
 st.set_page_config(
-    page_title="StoryWeaver Platform",
-    page_icon="✨",
+    page_title="Unified RAG System",
+    page_icon="🔗",
     layout="wide",
     initial_sidebar_state="collapsed"
 )
 
-# Custom CSS
-st.markdown("""
-<style>
-    .main-header {
-        text-align: center;
-        padding: 2rem 0;
-    }
-    .main-header h1 {
-        color: #4A90E2;
-        font-size: 3rem;
-        margin-bottom: 0.5rem;
-    }
-    .main-header p {
-        color: #666;
-        font-size: 1.2rem;
-    }
-    .mode-card {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        border-radius: 12px;
-        padding: 2rem;
-        color: white;
-        min-height: 300px;
-    }
-    .mode-card-doc {
-        background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
-    }
-    .mode-card-story {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    }
-    .feature-list {
-        list-style: none;
-        padding: 0;
-        margin-top: 1rem;
-    }
-    .feature-list li {
-        padding: 0.5rem 0;
-        display: flex;
-        align-items: center;
-    }
-    .stButton > button {
-        width: 100%;
-        padding: 1rem;
-        font-size: 1.1rem;
-        font-weight: bold;
-        border-radius: 8px;
-    }
-</style>
-""", unsafe_allow_html=True)
+# Load Cyberpunk Design System
+load_cyberpunk_theme()
 
 # Hero Section
 st.markdown("""
-<div class="main-header">
-    <h1>✨ StoryWeaver Platform ✨</h1>
-    <p>Dual-Mode RAG System: Document Analysis & AI Story Generation</p>
+<div class="main-header" style="text-align: center; margin-bottom: 2rem;">
+    <h1 class="glitch-hover" style="font-size: 3.5rem; margin-bottom: 0;">UNIFIED_RAG_SYSTEM</h1>
+    <p style="color: var(--neon-cyan); letter-spacing: 2px; font-family: var(--font-ui);">
+        > SYSTEM_READY // MODE_SELECT_REQUIRED <span style="animation: blink 1s infinite">_</span>
+    </p>
 </div>
 """, unsafe_allow_html=True)
 
 st.divider()
 
-# Three-column mode selection
-col1, col2, col3 = st.columns(3)
+# Four-column mode selection
+col1, col2, col3, col4 = st.columns(4)
 
 with col1:
-    st.markdown("### 📚 Document Analyzer")
     st.markdown("""
-    **Unified RAG System**
+    <div class="cyber-card">
+        <div class="cyber-header">DOC_ANALYZER</div>
+        <p style="font-size: 0.9rem; color: var(--text-secondary);">
+            Hybrid search matrix for document ingestion and semantic analysis.
+        </p>
+        <ul style="list-style: none; padding: 0; font-family: var(--font-ui); font-size: 0.8rem; color: var(--neon-green);">
+            <li>[+] HYBRID_SEARCH</li>
+            <li>[+] SEMANTIC_CACHE</li>
+            <li>[+] ADAPTIVE_WEIGHTS</li>
+        </ul>
+    </div>
+    """, unsafe_allow_html=True)
     
-    Standard hybrid search for general document analysis.
-    """)
-    
-    st.markdown("""
-    - 🔍 **Hybrid Search**
-    - 💾 **Semantic Caching**
-    - ⚖️ **Adaptive Weights**
-    """)
-    
-    st.markdown("")
-    if st.button("📖 Open Document Analyzer", key="doc_btn", use_container_width=True):
+    if st.button("INITIATE_ANALYSIS", key="doc_btn", use_container_width=True):
         st.switch_page("pages/document_app.py")
 
 with col2:
-    st.markdown("### 🧬 Elite Research Mode")
     st.markdown("""
-    **Advanced Intelligence Hub**
+    <div class="cyber-card">
+        <div class="cyber-header">QLORA_STUDIO</div>
+        <p style="font-size: 0.9rem; color: var(--text-secondary);">
+            Fine-tune LLM weights on local hardware via quantized adaptors.
+        </p>
+        <ul style="list-style: none; padding: 0; font-family: var(--font-ui); font-size: 0.8rem; color: var(--neon-purple);">
+            <li>[+] GROQ_DATASETS</li>
+            <li>[+] QLORA_TRAINING</li>
+            <li>[+] MODEL_EXPORT</li>
+        </ul>
+    </div>
+    """, unsafe_allow_html=True)
     
-    Research-grade RAG with Chain-of-Thought and QLoRA labs.
-    """)
-    
-    st.markdown("""
-    - 🧠 **Adaptive CoT Reasoning**
-    - 🔗 **Grounded Citations**
-    - 🧪 **QLoRA Fine-tuning**
-    - 📊 **Matrix Analytics**
-    """)
-    
-    st.markdown("")
-    if st.button("🔱 Enter Elite Mode", key="elite_btn", use_container_width=True):
-        st.switch_page("pages/elite_app.py")
+    if st.button("ACCESS_LAB", key="qlora_btn", use_container_width=True):
+        st.switch_page("pages/qlora_studio.py")
 
 with col3:
-    st.markdown("### 🎭 Story Mode")
     st.markdown("""
-    **Narrative Generation**
+    <div class="cyber-card">
+        <div class="cyber-header">STORY_WEAVER</div>
+        <p style="font-size: 0.9rem; color: var(--text-secondary);">
+            Narrative generation engine with Graph RAG entity tracking.
+        </p>
+        <ul style="list-style: none; padding: 0; font-family: var(--font-ui); font-size: 0.8rem; color: var(--neon-cyan);">
+            <li>[+] GRAPH_RETRIEVAL</li>
+            <li>[+] ENTITY_TRACKING</li>
+            <li>[+] PLOT_BRANCHING</li>
+        </ul>
+    </div>
+    """, unsafe_allow_html=True)
     
-    Generate stories using Graph RAG and comparison engines.
-    """)
-    
-    st.markdown("""
-    - 🆚 **Graph vs Unified RAG**
-    - 👥 **Character Tracking**
-    - 🕸️ **Relationship Graphs**
-    """)
-    
-    st.markdown("")
-    if st.button("🎭 Enter Story Mode", key="story_btn", use_container_width=True):
+    if st.button("ENTER_SIMULATION", key="story_btn", use_container_width=True):
         st.switch_page("pages/story_app.py")
 
-with col3:
-    st.markdown("### 🧪 Meta-Analysis")
+with col4:
     st.markdown("""
-    **A/B Test Engine**
+    <div class="cyber-card">
+        <div class="cyber-header">META_ANALYSIS</div>
+        <p style="font-size: 0.9rem; color: var(--text-secondary);">
+            Statistical aggregation engine like "Feature 3" for A/B tests.
+        </p>
+        <ul style="list-style: none; padding: 0; font-family: var(--font-ui); font-size: 0.8rem; color: var(--danger);">
+            <li>[+] STAT_ENGINE</li>
+            <li>[+] BIAS_DETECTION</li>
+            <li>[+] DATA_SYNTHESIS</li>
+        </ul>
+    </div>
+    """, unsafe_allow_html=True)
     
-    Aggregate experiments, detect bias, and find the true effect.
-    """)
-    
-    st.markdown("""
-    - 📊 **Statistical Engine**: Fixed & Random effects
-    - 🔍 **Bias Detection**: Publication bias & outliers
-    - 🧠 **AI Insights**: RAG-powered interpretation
-    - 📈 **Visualizations**: Interactive plots
-    """)
-    
-    st.markdown("")
-    if st.button("🧪 Open Meta-Analysis", key="meta_btn", use_container_width=True):
+    if st.button("RUN_DIAGNOSTICS", key="meta_btn", use_container_width=True):
         st.switch_page("pages/meta_analysis_app.py")
 
 # Footer section
-st.divider()
+st.markdown("---")
 
 col1, col2, col3 = st.columns(3)
 
 with col1:
-    st.markdown("#### 🔧 Hardware Optimized")
-    st.caption("Runs on 16GB RAM + RTX 4050 (6GB VRAM)")
+    st.markdown("""
+    <div style="border-left: 2px solid var(--border-dim); padding-left: 10px;">
+        <div style="font-family: var(--font-ui); color: var(--text-secondary); font-size: 0.8rem;">HARDWARE</div>
+        <div style="font-family: var(--font-headings); color: var(--text-primary);">RTX 4050 / 16GB</div>
+    </div>
+    """, unsafe_allow_html=True)
 
 with col2:
-    st.markdown("#### ⚡ Fast & Efficient")
-    st.caption("fp16 precision, batch processing, auto cleanup")
+    st.markdown("""
+    <div style="border-left: 2px solid var(--border-dim); padding-left: 10px;">
+        <div style="font-family: var(--font-ui); color: var(--text-secondary); font-size: 0.8rem;">ENGINE</div>
+        <div style="font-family: var(--font-headings); color: var(--text-primary);">FP16 PRECISION</div>
+    </div>
+    """, unsafe_allow_html=True)
 
 with col3:
-    st.markdown("#### 🌐 Dual API")
-    st.caption("FastAPI REST + Streamlit Web UI")
+    st.markdown("""
+    <div style="border-left: 2px solid var(--border-dim); padding-left: 10px;">
+        <div style="font-family: var(--font-ui); color: var(--text-secondary); font-size: 0.8rem;">INTERFACE</div>
+        <div style="font-family: var(--font-headings); color: var(--text-primary);">DUAL_API_LINK</div>
+    </div>
+    """, unsafe_allow_html=True)

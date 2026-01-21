@@ -1,0 +1,26 @@
+# QLoRA Training Studio - Dependencies
+
+# Core ML Libraries
+torch>=2.0.0
+transformers>=4.35.0
+datasets>=2.14.0
+accelerate>=0.24.0
+peft>=0.6.0
+bitsandbytes>=0.41.0
+sentencepiece>=0.1.99
+protobuf>=3.20.0
+
+# Groq API (for instant dataset generation)
+groq>=0.4.0
+
+# Streamlit & UI
+streamlit>=1.28.0
+plotly>=5.17.0
+pandas>=2.0.0
+
+# Utilities
+tqdm>=4.66.0
+
+# Optional but recommended
+scipy>=1.11.0
+scikit-learn>=1.3.0

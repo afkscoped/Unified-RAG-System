@@ -12,13 +12,15 @@ sys.path.insert(0, str(root))
 # Set the working directory to the project root
 os.chdir(root)
 
-# Import the landing page
 import streamlit as st
 
-# We need to run the landing page logic
-# Since st.set_page_config must be the first command, 
-# we'll just shell out to the original landing page for proper multi-page support
-# OR, we can just tell the user to run: streamlit run src/ui/landing_page.py
-# But providing a master entry point is better.
+st.set_page_config(
+    page_title="QLoRA Training Studio",
+    page_icon="🧬",
+    layout="wide",
+    initial_sidebar_state="expanded"
+)
 
-from src.ui import landing_page
+from src.elite_app.main import render_app
+
+render_app(set_page_config=False)

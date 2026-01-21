@@ -279,15 +279,18 @@ class MultiHopDiscoveryEngine:
         Returns:
             List of causal chain dictionaries
         """
+        logger.info(f"Tracing causal chains for event: {event_id} (max_depth={max_depth})")
         causal_chains = []
         graph = self.story_graph.graph
         
         if event_id not in graph:
+            logger.warning(f"Event ID {event_id} not found in graph")
             return []
         
         def trace_backwards(current_event: str, chain: List[str], depth: int):
             if depth >= max_depth:
                 if len(chain) > 1:
+                    logger.debug(f"Reached max depth at {current_event}, chain: {chain}")
                     causal_chains.append(chain.copy())
                 return
             
@@ -304,10 +307,18 @@ class MultiHopDiscoveryEngine:
             if not predecessors:
                 # Reached a root cause
                 if len(chain) > 1:
+                    logger.debug(f"Reached root cause at {current_event}, chain: {chain}")
                     causal_chains.append(chain.copy())
+                else:
+                    logger.debug(f"No predecessors for {current_event}, no chain formed")
                 return
             
             for pred in predecessors:
+                # Avoid cycles
+                if pred in chain:
+                    logger.warning(f"Cycle detected in causal chain: {pred} -> ... -> {current_event}")
+                    continue
+                    
                 chain.append(pred)
                 trace_backwards(pred, chain, depth + 1)
                 chain.pop()
@@ -330,6 +341,7 @@ class MultiHopDiscoveryEngine:
                 "narrative": " led to ".join(event_names)
             })
         
+        logger.info(f"Discovered {len(formatted_chains)} causal chains for {event_id}")
         return formatted_chains
     
     def find_hidden_connections(

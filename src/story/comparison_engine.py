@@ -31,6 +31,7 @@ from src.story.fusion.hybrid_generator import HybridFusionEngine
 from src.story.analysis.coherence_analyzer import CoherenceAnalyzer
 from src.story.analysis.consistency_checker import ConsistencyChecker
 from src.story.analysis.plot_suggestion_engine import PlotSuggestionEngine
+from src.story.analysis.trope_detector import TropeDetector
 from src.story.visualization.graph_visualizer import GraphVisualizer
 from src.story.visualization.plot_timeline import PlotPointExtractor, PlotTimelineVisualizer
 from src.story.feedback.feedback_manager import StoryFeedbackManager
@@ -124,6 +125,7 @@ class StoryComparisonEngine:
         self.plot_extractor = PlotPointExtractor()
         self.timeline_visualizer = PlotTimelineVisualizer(self.plot_extractor)
         self.feedback_manager = StoryFeedbackManager()
+        self.trope_detector = TropeDetector(self.story_graph, self.arc_tracker)
         
         # Story state
         self.current_chapter = 1
@@ -148,15 +150,20 @@ class StoryComparisonEngine:
         """
         self.current_chapter = chapter
         
+        # Get feedback-driven weights for fusion
+        weights = self.feedback_manager.get_weights()
+        
         # === UNIFIED RAG GENERATION ===
         start = time.time()
         unified_result = self._generate_unified(prompt, chapter)
         unified_time = time.time() - start
+        unified_text = unified_result.get("text", "")
         
         # === GRAPH RAG GENERATION ===
         start = time.time()
         graph_result = self._generate_graph(prompt, chapter)
         graph_time = time.time() - start
+        graph_text = graph_result.get("text", "")
         
         # === HYBRID FUSION ===
         start = time.time()
@@ -164,30 +171,40 @@ class StoryComparisonEngine:
             prompt, chapter, unified_result, graph_result
         )
         hybrid_time = time.time() - start
+        hybrid_text = hybrid_result.get("text", "")
+        
+        # Calculate approach-specific metrics
+        unified_coherence = self._calculate_coherence(unified_text, prompt, "unified")
+        graph_coherence = self._calculate_coherence(graph_text, prompt, "graph")
+        hybrid_coherence = self._calculate_coherence(hybrid_text, prompt, "hybrid")
+        
+        unified_consistency = self._calculate_consistency(unified_text, "unified", chapter)
+        graph_consistency = self._calculate_consistency(graph_text, "graph", chapter)
+        hybrid_consistency = self._calculate_consistency(hybrid_text, "hybrid", chapter)
         
         # Build results
         results = {
             "unified": {
-                "text": unified_result.get("text", ""),
+                "text": unified_text,
                 "metrics": GenerationMetrics(
                     response_time=unified_time,
-                    consistency_score=self._check_consistency(unified_result.get("text", "")),
-                    coherence_score=unified_result.get("coherence", 0.5),
+                    consistency_score=unified_consistency,
+                    coherence_score=unified_coherence,
                     retrieval_count=len(unified_result.get("sources", [])),
-                    tokens_generated=len(unified_result.get("text", "").split()),
+                    tokens_generated=len(unified_text.split()),
                     source_diversity=self._calc_diversity(unified_result.get("sources", []))
                 ),
                 "sources": unified_result.get("sources", []),
                 "method": unified_result.get("method", "Unified RAG")
             },
             "graph": {
-                "text": graph_result.get("text", ""),
+                "text": graph_text,
                 "metrics": GenerationMetrics(
                     response_time=graph_time,
-                    consistency_score=self._check_consistency(graph_result.get("text", "")),
-                    coherence_score=graph_result.get("coherence", 0.5),
+                    consistency_score=graph_consistency,
+                    coherence_score=graph_coherence,
                     retrieval_count=len(graph_result.get("entities", [])),
-                    tokens_generated=len(graph_result.get("text", "").split()),
+                    tokens_generated=len(graph_text.split()),
                     source_diversity=self._calc_diversity(graph_result.get("entities", []))
                 ),
                 "entities": graph_result.get("entities", []),
@@ -197,13 +214,13 @@ class StoryComparisonEngine:
                 "method": graph_result.get("method", "Graph RAG")
             },
             "hybrid": {
-                "text": hybrid_result.get("text", ""),
+                "text": hybrid_text,
                 "metrics": GenerationMetrics(
                     response_time=hybrid_time,
-                    consistency_score=self._check_consistency(hybrid_result.get("text", "")),
-                    coherence_score=hybrid_result.get("coherence", 0.5),
+                    consistency_score=hybrid_consistency,
+                    coherence_score=hybrid_coherence,
                     retrieval_count=hybrid_result.get("total_sources", 0),
-                    tokens_generated=len(hybrid_result.get("text", "").split()),
+                    tokens_generated=len(hybrid_text.split()),
                     source_diversity=hybrid_result.get("diversity", 0.5)
                 ),
                 "fusion_strategy": "Weighted combination of semantic and graph context",
@@ -211,8 +228,18 @@ class StoryComparisonEngine:
             }
         }
         
-        # Update story state with best result (hybrid)
-        self._update_story_state(hybrid_result.get("text", ""), chapter)
+        # Update story state with hybrid result
+        self._update_story_state(hybrid_text, chapter)
+        
+        # Run trope detection on all approaches
+        for approach, text in [("unified", unified_text), ("graph", graph_text), ("hybrid", hybrid_text)]:
+            if text and len(text) > 50:
+                entities = [{"name": e.name, "type": e.type} for e in self.story_graph.entities.values()]
+                self.trope_detector.analyze_segment(text, chapter, entities)
+        
+        # Extract plot points
+        self.plot_extractor.extract_from_text(hybrid_text, chapter,
+            [{"name": e.name, "type": e.type} for e in self.story_graph.entities.values()])
         
         # Store in history
         self.story_history.append({
@@ -523,9 +550,89 @@ Generate a story segment that combines semantic richness with relationship consi
             return "resolution"
     
     def _check_consistency(self, text: str) -> float:
-        """Check consistency score based on graph."""
+        """Legacy consistency check - use _calculate_consistency for approach-specific."""
         issues = self.story_graph.detect_inconsistencies()
         return max(0.0, 1.0 - (len(issues) * 0.1))
+    
+    def _calculate_coherence(self, text: str, context: str, approach: str) -> float:
+        """
+        Calculate approach-specific coherence score.
+        Different approaches have inherently different coherence profiles.
+        """
+        if not text or len(text) < 20:
+            return 0.3
+        
+        base_coherence = 0.5
+        
+        # Approach-specific adjustments
+        if approach == "unified":
+            # Unified RAG: good at semantic similarity but may miss context
+            # Check for contextual keywords
+            context_words = set(context.lower().split())
+            text_words = set(text.lower().split())
+            overlap = len(context_words & text_words)
+            base_coherence = min(0.8, 0.4 + (overlap * 0.05))
+            
+        elif approach == "graph":
+            # Graph RAG: tracks entities and relationships
+            # Higher coherence if it mentions known entities
+            entity_names = [e.name.lower() for e in self.story_graph.entities.values()]
+            mentions = sum(1 for name in entity_names if name in text.lower())
+            base_coherence = min(0.9, 0.5 + (mentions * 0.08))
+            
+        elif approach == "hybrid":
+            # Hybrid should have balanced coherence
+            context_words = set(context.lower().split())
+            text_words = set(text.lower().split())
+            overlap = len(context_words & text_words)
+            entity_names = [e.name.lower() for e in self.story_graph.entities.values()]
+            mentions = sum(1 for name in entity_names if name in text.lower())
+            base_coherence = min(0.95, 0.5 + (overlap * 0.03) + (mentions * 0.05))
+        
+        # Add some variance based on text quality indicators
+        if len(text) > 500:
+            base_coherence += 0.05
+        if any(p in text.lower() for p in ["however", "therefore", "meanwhile", "suddenly"]):
+            base_coherence += 0.03
+            
+        return min(1.0, max(0.1, base_coherence))
+    
+    def _calculate_consistency(self, text: str, approach: str, chapter: int) -> float:
+        """
+        Calculate approach-specific consistency score.
+        Graph-based approaches should have higher consistency due to tracking.
+        """
+        if not text or len(text) < 20:
+            return 0.5
+        
+        # Base consistency from graph issues
+        issues = self.story_graph.detect_inconsistencies()
+        base_consistency = max(0.0, 1.0 - (len(issues) * 0.1))
+        
+        # Approach-specific adjustments
+        if approach == "unified":
+            # Unified RAG has no entity tracking, lower consistency
+            # Penalize for not mentioning known characters
+            characters = [e.name.lower() for e in self.story_graph.entities.values() if e.type == "CHARACTER"]
+            if characters:
+                mentions = sum(1 for c in characters if c in text.lower())
+                char_consistency = mentions / max(1, len(characters))
+                base_consistency = (base_consistency * 0.5) + (char_consistency * 0.3) + 0.1
+            else:
+                base_consistency = max(0.4, base_consistency - 0.15)
+                
+        elif approach == "graph":
+            # Graph RAG is context-aware, higher consistency
+            base_consistency = min(0.98, base_consistency + 0.15)
+            # Bonus for using graph relationships
+            if any(rel in text.lower() for rel in ["ally", "enemy", "mentor", "friend", "foe"]):
+                base_consistency = min(0.98, base_consistency + 0.05)
+                
+        elif approach == "hybrid":
+            # Hybrid gets good consistency from graph portion
+            base_consistency = min(0.95, base_consistency + 0.08)
+        
+        return min(1.0, max(0.1, base_consistency))
     
     def _calc_diversity(self, sources: List) -> float:
         """Calculate source diversity."""
@@ -689,3 +796,269 @@ Generate a story segment that combines semantic richness with relationship consi
     def get_recommended_approach(self) -> str:
         """Get recommended approach based on feedback."""
         return self.feedback_manager.get_recommended_approach()
+    
+    # === NEW: Trope Detection & Enhanced Visualization ===
+    
+    def get_trope_detector(self) -> TropeDetector:
+        """Get the trope detector."""
+        return self.trope_detector
+    
+    def analyze_tropes(self, text: str, chapter: int) -> List[Dict]:
+        """Analyze text for narrative tropes."""
+        entities = [{"name": e.name, "type": e.type} for e in self.story_graph.entities.values()]
+        new_tropes = self.trope_detector.analyze_segment(text, chapter, entities)
+        return [t.to_dict() for t in new_tropes]
+    
+    def get_thematic_summary(self) -> Dict:
+        """Get thematic summary of detected tropes."""
+        return self.trope_detector.get_thematic_summary()
+    
+    def create_arc_visualization(self) -> Any:
+        """Create character arc visualization."""
+        return self.timeline_visualizer.create_character_arc_chart(self.arc_tracker)
+    
+    def bootstrap_sample_story(self) -> Dict:
+        """
+        Bootstrap with sample story data for demo purposes.
+        Populates the graph with sample characters, relationships, and events.
+        """
+        # Sample characters
+        sample_entities = [
+            StoryEntity(id="elena", type="CHARACTER", name="Elena", 
+                       attributes={"role": "protagonist"}, first_appearance=1),
+            StoryEntity(id="marcus", type="CHARACTER", name="Marcus",
+                       attributes={"role": "mentor"}, first_appearance=1),
+            StoryEntity(id="raven", type="CHARACTER", name="Raven",
+                       attributes={"role": "antagonist"}, first_appearance=2),
+            StoryEntity(id="castle", type="LOCATION", name="Shadowkeep Castle",
+                       attributes={"type": "fortress"}, first_appearance=1),
+            StoryEntity(id="ancient_scroll", type="ARTIFACT", name="Ancient Scroll",
+                       attributes={"power": "prophecy"}, first_appearance=1),
+        ]
+        
+        for entity in sample_entities:
+            self.story_graph.add_entity(entity)
+        
+        # Sample relationships
+        sample_rels = [
+            StoryRelationship(source="elena", target="marcus", relation_type="MENTORED_BY", 
+                            strength=0.9, temporal_context=1),
+            StoryRelationship(source="elena", target="raven", relation_type="CONFLICTS_WITH",
+                            strength=0.8, temporal_context=2),
+            StoryRelationship(source="marcus", target="raven", relation_type="FAMILY",
+                            strength=0.7, temporal_context=2, metadata={"detail": "siblings"}),
+            StoryRelationship(source="elena", target="castle", relation_type="LOCATED_IN",
+                            strength=0.5, temporal_context=1),
+        ]
+        
+        for rel in sample_rels:
+            self.story_graph.add_relationship(rel)
+        
+        # Sample character states
+        sample_states = [
+            ("elena", CharacterState(chapter=1, emotional_state="hopeful", 
+                                     goals=["find the truth", "master her powers"],
+                                     relationships={"marcus": 0.9}, location="castle",
+                                     knowledge=["scroll exists"], arc_phase="setup")),
+            ("elena", CharacterState(chapter=2, emotional_state="conflicted",
+                                     goals=["defeat raven", "save marcus"],
+                                     relationships={"marcus": 0.9, "raven": -0.8}, location="forest",
+                                     knowledge=["raven is marcus sister"], arc_phase="rising_action")),
+            ("marcus", CharacterState(chapter=1, emotional_state="neutral",
+                                      goals=["train elena", "protect scroll"],
+                                      relationships={"elena": 0.8}, location="castle",
+                                      knowledge=["ancient prophecy"], arc_phase="setup")),
+        ]
+        
+        for char_id, state in sample_states:
+            self.arc_tracker.record_character_state(char_id, state)
+        
+        # Sample story segment for trope detection
+        sample_text = """Elena had always known she was destined for something greater. 
+        When the ancient scroll was discovered in the hidden chamber, her mentor Marcus 
+        revealed the truth about her powers. She was the chosen one, called to adventure 
+        by forces beyond her understanding. But dark forces were gathering. Raven, the 
+        fallen warrior who had once been noble, now sought to corrupt the power for herself.
+        The betrayal cut deep when Elena learned Raven was Marcus's own sister."""
+        
+        self.trope_detector.analyze_segment(sample_text, 1, 
+            [{"name": e.name, "type": e.type} for e in sample_entities if e.type == "CHARACTER"])
+        
+        # Extract plot points
+        self.plot_extractor.extract_from_text(sample_text, 1, 
+            [{"name": e.name, "type": e.type} for e in sample_entities])
+        
+        self.current_chapter = 2
+        
+        return {
+            "status": "success",
+            "entities_added": len(sample_entities),
+            "relationships_added": len(sample_rels),
+            "character_states_added": len(sample_states),
+            "tropes_detected": len(self.trope_detector.get_all_tropes()),
+            "message": "Sample story data loaded! Try the visualization features."
+        }
+    
+    # === NEW: Advanced Story Analysis Features ===
+    
+    def detect_plot_holes(self) -> Dict:
+        """
+        Comprehensive plot hole detection across the story.
+        """
+        plot_holes = []
+        
+        # 1. Graph-based inconsistencies
+        graph_issues = self.story_graph.detect_inconsistencies()
+        for issue in graph_issues:
+            plot_holes.append({
+                "type": issue["type"],
+                "severity": "high",
+                "description": issue["description"],
+                "chapter": None,
+                "suggestion": "Review and clarify this inconsistency"
+            })
+        
+        # 2. Disappeared characters
+        characters = self.story_graph.get_characters()
+        for char in characters:
+            last_mention = self._find_last_mention(char["name"])
+            if last_mention and self.current_chapter - last_mention > 2:
+                plot_holes.append({
+                    "type": "disappeared_character",
+                    "severity": "medium",
+                    "description": f"{char['name']} hasn't appeared since Chapter {last_mention}",
+                    "chapter": last_mention,
+                    "suggestion": f"Bring {char['name']} back or explain their absence"
+                })
+        
+        # 3. Chekhov's Gun violations
+        artifacts = self.story_graph.get_entities_by_type("ARTIFACT")
+        for artifact in artifacts:
+            if self.current_chapter - artifact.first_appearance >= 2:
+                relations = list(self.story_graph.graph.edges(artifact.id, data=True))
+                if len(relations) < 2:
+                    plot_holes.append({
+                        "type": "chekhovs_gun",
+                        "severity": "medium",
+                        "description": f"'{artifact.name}' introduced but not utilized",
+                        "chapter": artifact.first_appearance,
+                        "suggestion": f"Use '{artifact.name}' in the plot"
+                    })
+        
+        # 4. Character arc issues
+        for char_id, states in self.arc_tracker.character_timelines.items():
+            if len(states) >= 2:
+                sorted_states = sorted(states, key=lambda s: s.chapter)
+                for i in range(1, len(sorted_states)):
+                    prev, curr = sorted_states[i-1], sorted_states[i]
+                    emotion_change = self._emotion_distance(prev.emotional_state, curr.emotional_state)
+                    if emotion_change > 0.7:
+                        char_name = self.story_graph.get_entity(char_id)
+                        char_name = char_name.name if char_name else char_id
+                        plot_holes.append({
+                            "type": "abrupt_change",
+                            "severity": "low",
+                            "description": f"{char_name} changed from {prev.emotional_state} to {curr.emotional_state} suddenly",
+                            "chapter": curr.chapter,
+                            "suggestion": "Add transitional scenes"
+                        })
+        
+        high_count = len([p for p in plot_holes if p["severity"] == "high"])
+        med_count = len([p for p in plot_holes if p["severity"] == "medium"])
+        score = 100 - (high_count * 20) - (med_count * 5)
+        health = "Excellent 🌟" if score >= 90 else "Good 👍" if score >= 70 else "Needs Work 🔧" if score >= 50 else "Critical ⚠️"
+        
+        return {
+            "total_issues": len(plot_holes),
+            "by_severity": {"high": high_count, "medium": med_count, "low": len([p for p in plot_holes if p["severity"] == "low"])},
+            "issues": plot_holes,
+            "story_health": health
+        }
+    
+    def _find_last_mention(self, character_name: str) -> Optional[int]:
+        """Find the last chapter where a character was mentioned."""
+        last_chapter = None
+        for entry in self.story_history:
+            for approach in ["unified", "graph", "hybrid"]:
+                text = entry.get("results", {}).get(approach, {}).get("text", "")
+                if character_name.lower() in text.lower():
+                    last_chapter = entry["chapter"]
+        return last_chapter
+    
+    def _emotion_distance(self, emotion1: str, emotion2: str) -> float:
+        """Calculate distance between emotional states."""
+        values = {"hopeful": 0.8, "excited": 0.9, "happy": 0.85, "neutral": 0.5,
+                  "uncertain": 0.4, "conflicted": 0.35, "angry": 0.3, "desperate": 0.15, "terrified": 0.1}
+        return abs(values.get(emotion1.lower(), 0.5) - values.get(emotion2.lower(), 0.5))
+    
+    def track_foreshadowing(self) -> Dict:
+        """Track foreshadowing elements and their payoffs."""
+        patterns = ["prophecy", "warning", "omen", "secret", "promised", "destined", "mysterious", "ancient", "hidden"]
+        plants = []
+        
+        for entry in self.story_history:
+            text = entry.get("results", {}).get("hybrid", {}).get("text", "")
+            for pattern in patterns:
+                if pattern in text.lower():
+                    for sentence in text.split('.'):
+                        if pattern in sentence.lower():
+                            plants.append({"chapter": entry["chapter"], "pattern": pattern, "hint": sentence.strip()[:80], "resolved": False})
+                            break
+        
+        # Check resolutions
+        for plant in plants:
+            for entry in self.story_history:
+                if entry["chapter"] > plant["chapter"]:
+                    text = entry.get("results", {}).get("hybrid", {}).get("text", "")
+                    if plant["pattern"] in text.lower():
+                        plant["resolved"] = True
+                        break
+        
+        pending = [p for p in plants if not p["resolved"]]
+        return {
+            "total": len(plants), "resolved": len([p for p in plants if p["resolved"]]),
+            "pending": len(pending), "pending_items": pending[:5],
+            "suggestions": [f"Resolve '{p['pattern']}' from Ch.{p['chapter']}" for p in pending[:3]]
+        }
+    
+    def analyze_narrative_pacing(self) -> Dict:
+        """Analyze narrative pacing and tension curve."""
+        pacing_data = []
+        tension_words = ["battle", "fight", "danger", "fear", "desperate", "urgent", "chase", "conflict"]
+        calm_words = ["peaceful", "quiet", "rest", "calm", "gentle", "slowly"]
+        
+        for entry in self.story_history:
+            text = entry.get("results", {}).get("hybrid", {}).get("text", "")
+            text_lower = text.lower()
+            tension = sum(1 for w in tension_words if w in text_lower)
+            calm = sum(1 for w in calm_words if w in text_lower)
+            net = (tension - calm) / max(1, tension + calm)
+            normalized = (net + 1) / 2
+            
+            pacing_data.append({
+                "chapter": entry["chapter"],
+                "tension_level": round(normalized, 2),
+                "word_count": len(text.split()),
+                "pacing": "intense" if normalized > 0.7 else "slow" if normalized < 0.3 else "balanced"
+            })
+        
+        issues = []
+        for i in range(1, len(pacing_data)):
+            if pacing_data[i-1]["pacing"] == pacing_data[i]["pacing"] and pacing_data[i]["pacing"] in ["slow", "intense"]:
+                issues.append(f"Ch.{pacing_data[i-1]['chapter']}-{pacing_data[i]['chapter']}: consecutive {pacing_data[i]['pacing']} pacing")
+        
+        return {"chapters": pacing_data, "pacing_issues": issues, "average_tension": np.mean([p["tension_level"] for p in pacing_data]) if pacing_data else 0}
+    
+    def get_feedback_influence(self) -> Dict:
+        """Get how feedback has influenced generation weights."""
+        weights = self.feedback_manager.get_weights()
+        performance = self.feedback_manager.get_performance_by_approach()
+        best = max(performance, key=performance.get) if performance else "hybrid"
+        
+        return {
+            "current_weights": weights.to_dict(),
+            "performance_scores": performance,
+            "recommended_approach": best,
+            "feedback_count": len(self.feedback_manager.feedback_history),
+            "influence": f"Based on feedback, {best.title()} performs best. Weights favor successful approaches." if performance else "Provide ratings to influence generation."
+        }

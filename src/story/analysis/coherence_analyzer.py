@@ -23,6 +23,7 @@ class CoherenceBreakdown:
     lexical: float = 0.0
     discourse: float = 0.0
     temporal: float = 0.0
+    voice: float = 0.0
     composite: float = 0.0
     
     # Detailed sub-scores
@@ -34,6 +35,7 @@ class CoherenceBreakdown:
             "lexical": self.lexical,
             "discourse": self.discourse,
             "temporal": self.temporal,
+            "voice": self.voice,
             "composite": self.composite,
             "details": self.details
         }
@@ -61,10 +63,11 @@ class CoherenceAnalyzer:
         """
         self.embedding_manager = embedding_manager
         self.weights = weights or {
-            "semantic": 0.30,
+            "semantic": 0.25,
             "lexical": 0.20,
-            "discourse": 0.30,
-            "temporal": 0.20
+            "discourse": 0.25,
+            "temporal": 0.15,
+            "voice": 0.15
         }
         
         logger.info("CoherenceAnalyzer initialized")
@@ -98,13 +101,15 @@ class CoherenceAnalyzer:
         lexical = self.calculate_lexical_coherence(generated_text, context, previous_segments)
         discourse = self.calculate_discourse_coherence(generated_text, entities, previous_segments)
         temporal = self.calculate_temporal_coherence(generated_text, chapter, previous_segments)
+        voice = self.calculate_voice_coherence(generated_text, context, previous_segments)
         
         # Calculate weighted composite
         composite = (
             self.weights["semantic"] * semantic +
             self.weights["lexical"] * lexical +
             self.weights["discourse"] * discourse +
-            self.weights["temporal"] * temporal
+            self.weights["temporal"] * temporal +
+            self.weights["voice"] * voice
         )
         
         return CoherenceBreakdown(
@@ -112,12 +117,14 @@ class CoherenceAnalyzer:
             lexical=lexical,
             discourse=discourse,
             temporal=temporal,
+            voice=voice,
             composite=composite,
             details={
                 "semantic_context_similarity": semantic,
                 "lexical_ngram_overlap": lexical,
                 "entity_continuity": discourse,
-                "temporal_consistency": temporal
+                "temporal_consistency": temporal,
+                "voice_consistency": voice
             }
         )
     
@@ -311,6 +318,73 @@ class CoherenceAnalyzer:
         
         return max(0, min(1.0, tense_consistency * 0.5 + sequence_score * 0.3 + 0.2 + penalty))
     
+    def calculate_voice_coherence(
+        self,
+        generated_text: str,
+        context: str,
+        previous_segments: List[str]
+    ) -> float:
+        """
+        Calculate narrative voice consistency.
+        
+        Measures:
+        1. Sentence length distribution similarity (style)
+        2. POV consistency (pronoun usage)
+        3. Vocabulary complexity (unique words ratio)
+        """
+        if not generated_text:
+            return 0.0
+            
+        # Establish reference text
+        reference_texts = previous_segments[-3:] if previous_segments else []
+        # If no previous segments, use context or default to high coherence (self-consistent)
+        if not reference_texts:
+            return 1.0 
+            
+        ref_text = " ".join(reference_texts)
+        
+        # 1. Sentence Length Similarity
+        gen_sentences = self._split_sentences(generated_text)
+        ref_sentences = self._split_sentences(ref_text)
+        
+        if not gen_sentences or not ref_sentences:
+            return 0.5
+            
+        gen_lens = [len(s.split()) for s in gen_sentences]
+        ref_lens = [len(s.split()) for s in ref_sentences]
+        
+        avg_gen = np.mean(gen_lens) if gen_lens else 0
+        avg_ref = np.mean(ref_lens) if ref_lens else 0
+        
+        # Normalized difference
+        len_sim = max(0, 1 - abs(avg_gen - avg_ref) / max(avg_ref, 1))
+        
+        # 2. POV Consistency
+        def get_pov_vector(text):
+            tokens = self._tokenize(text.lower())
+            first_person = sum(1 for t in tokens if t in {'i', 'me', 'my', 'mine', 'we', 'us', 'our'})
+            third_person = sum(1 for t in tokens if t in {'he', 'him', 'his', 'she', 'her', 'they', 'them', 'their'})
+            total = first_person + third_person + 1
+            return first_person / total
+            
+        gen_pov = get_pov_vector(generated_text)
+        ref_pov = get_pov_vector(ref_text)
+        
+        pov_sim = 1.0 - abs(gen_pov - ref_pov)
+        
+        # 3. Vocabulary Complexity (Type-Token Ratio)
+        def get_ttr(text):
+            tokens = self._tokenize(text.lower())
+            if not tokens: return 0
+            return len(set(tokens)) / len(tokens)
+            
+        gen_ttr = get_ttr(generated_text)
+        ref_ttr = get_ttr(ref_text)
+        
+        complexity_sim = 1.0 - min(abs(gen_ttr - ref_ttr) * 2, 1.0)
+        
+        return len_sim * 0.3 + pov_sim * 0.5 + complexity_sim * 0.2
+
     def compare_approaches(
         self,
         unified_text: str,

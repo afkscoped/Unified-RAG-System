@@ -135,6 +135,23 @@ class EmbeddingManager:
         """Encode a single text."""
         return self.encode([text], normalize=normalize)[0]
     
+    def get_embeddings(self, texts: List[str]) -> np.ndarray:
+        """
+        Get embeddings for a list of texts (alias for encode).
+        
+        Args:
+            texts: List of text strings to embed
+            
+        Returns:
+            numpy array of shape (len(texts), embedding_dim)
+        """
+        return self.encode(texts, normalize=True)
+    
+    def get_embedding(self, text: str) -> np.ndarray:
+        """Get embedding for a single text (alias for encode_single)."""
+        return self.encode_single(text, normalize=True)
+
+    
     @property
     def embedding_dim(self) -> int:
         """Get embedding dimension."""

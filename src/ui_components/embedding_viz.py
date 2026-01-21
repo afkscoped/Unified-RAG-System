@@ -5,9 +5,17 @@ and renders an interactive scatter plot with Plotly.
 import streamlit as st
 import pandas as pd
 import plotly.express as px
-from umap import UMAP
 import numpy as np
 from typing import List, Dict, Any
+
+# Conditional UMAP import with fallback
+try:
+    from umap import UMAP
+    UMAP_AVAILABLE = True
+except ImportError:
+    UMAP_AVAILABLE = False
+    UMAP = None
+
 
 class EmbedVisualizer:
     """
@@ -15,17 +23,25 @@ class EmbedVisualizer:
     """
     
     def __init__(self):
-        self.reducer = UMAP(n_neighbors=15, min_dist=0.1, metric='cosine', random_state=42)
+        if UMAP_AVAILABLE:
+            self.reducer = UMAP(n_neighbors=15, min_dist=0.1, metric='cosine', random_state=42)
+        else:
+            self.reducer = None
 
     def render(self, embeddings: np.ndarray, texts: List[str], sources: List[str]):
         """
         Renders the cluster map.
         """
+        if not UMAP_AVAILABLE:
+            st.warning("⚠️ UMAP not installed. Install with: `pip install umap-learn`")
+            return
+            
         if embeddings is None or len(embeddings) < 2:
             st.info("🌐 Need at least 2 documents to visualize clusters.")
             return
 
         with st.spinner("🌍 Reducing dimensions (UMAP)..."):
+
             try:
                 # Reduce to 2D
                 projections = self.reducer.fit_transform(embeddings)

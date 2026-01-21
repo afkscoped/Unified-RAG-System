@@ -1,44 +1,32 @@
-# Environment
-.env
-venv/
-.venv/
-env/
 
 # Python
 __pycache__/
 *.py[cod]
 *$py.class
 *.so
-.Python
-build/
-dist/
-*.egg-info/
-.eggs/
+.env
+venv/
+.venv/
+env/
 
-# Data
-data/embeddings/*
-data/cache/*
-!data/embeddings/.gitkeep
-!data/cache/.gitkeep
-
-# IDE
-.idea/
+# IDEs
 .vscode/
-*.swp
-*.swo
+.idea/
 
-# OS
-.DS_Store
-Thumbs.db
-
-# Logs
-*.log
+# Project Specific
+cache/
+data/experiments/
+data/documents/
+data/graphs/
+data/fine_tuned_models/
+data/training_datasets/
 logs/
 
-# Models (downloaded at runtime)
-models/
-
-# Pytest
-.pytest_cache/
-.coverage
-htmlcov/
+# Large Files
+*.pdf
+*.zip
+*.tar
+*.gz
+*.pth
+*.bin
+*.model

@@ -65,22 +65,38 @@ class NarrativeEntityExtractor:
         self.conflict_verbs = {
             "fought", "attacked", "betrayed", "opposed", "killed", "defeated",
             "hated", "despised", "confronted", "challenged", "destroyed", "hurt",
-            "threatened", "stabbed", "shot", "ambushed", "cursed"
+            "threatened", "stabbed", "shot", "ambushed", "cursed",
+            "fight", "attack", "betray", "oppose", "kill", "defeat",
+            "hate", "despise", "confront", "challenge", "destroy", "hurt",
+            "threaten", "stab", "shoot", "ambush", "curse"
         }
         self.alliance_verbs = {
             "helped", "joined", "allied", "befriended", "saved", "protected",
             "loved", "trusted", "supported", "assisted", "rescued", "embraced",
-            "kissed", "hugged", "comforted", "accompanied"
+            "kissed", "hugged", "comforted", "accompanied",
+            "help", "join", "ally", "befriend", "save", "protect",
+            "love", "trust", "support", "assist", "rescue", "embrace",
+            "kiss", "hug", "comfort", "accompany"
         }
         self.family_verbs = {
-            "married", "wed", "adopted", "fathered", "mothered", "parented"
+            "married", "wed", "adopted", "fathered", "mothered", "parented",
+            "marry", "adopt", "father", "mother", "parent"
         }
         self.fear_verbs = {
-            "feared", "dreaded", "fled", "escaped", "hid", "cowered", "trembled"
+            "feared", "dreaded", "fled", "escaped", "hid", "cowered", "trembled",
+            "fear", "dread", "flee", "escape", "hide", "cower", "tremble"
+        }
+        self.causal_verbs = {
+            "caused", "led", "resulted", "triggered", "started", "began", 
+            "created", "forced", "provoked", "generated", "produced",
+            "cause", "lead", "result", "trigger", "start", "begin",
+            "create", "force", "provoke", "generate", "produce"
         }
         self.action_verbs = {
             "said", "shouted", "whispered", "thought", "felt", "looked",
-            "walked", "ran", "traveled", "arrived", "left", "discovered"
+            "walked", "ran", "traveled", "arrived", "left", "discovered",
+            "say", "shout", "whisper", "think", "feel", "look",
+            "walk", "run", "travel", "arrive", "leave", "discover"
         }
         
         # Pattern templates for relationship detection
@@ -312,7 +328,9 @@ class NarrativeEntityExtractor:
                 subject_token = None
                 for child in token.children:
                     if child.dep_ in ("nsubj", "nsubjpass"):
-                        subject = child.text
+                        # Get full compound subject if possible
+                        subject_span = self._get_compound_span(child)
+                        subject = subject_span.text
                         subject_token = child
                         break
                 
@@ -323,12 +341,14 @@ class NarrativeEntityExtractor:
                 objects = []
                 for child in token.children:
                     if child.dep_ in ("dobj", "pobj", "attr", "dative"):
-                        objects.append((child.text, child))
+                        obj_span = self._get_compound_span(child)
+                        objects.append((obj_span.text, child))
                     # Also check prepositional phrases
                     if child.dep_ == "prep":
                         for grandchild in child.children:
                             if grandchild.dep_ == "pobj":
-                                objects.append((grandchild.text, grandchild))
+                                obj_span = self._get_compound_span(grandchild)
+                                objects.append((obj_span.text, grandchild))
                 
                 # Classify relationship type
                 rel_type = self._classify_relation(token.lemma_)
@@ -338,22 +358,63 @@ class NarrativeEntityExtractor:
                 
                 # Create relationships
                 for obj_text, obj_token in objects:
-                    # Only create if both look like named entities
-                    if self._looks_like_entity(subject) and self._looks_like_entity(obj_text):
+                    # For causal relationships, be more permissive with entity checks
+                    is_causal = rel_type == "CAUSED_BY"
+                    
+                    is_event_source = self._is_potential_event(subject_token)
+                    is_event_target = self._is_potential_event(obj_token)
+                    
+                    looks_source = self._looks_like_entity(subject)
+                    looks_target = self._looks_like_entity(obj_text)
+                    
+                    valid_source = looks_source or (is_causal and is_event_source)
+                    valid_target = looks_target or (is_causal and is_event_target)
+                    
+                    if valid_source and valid_target:
+                        # Determine types
+                        source_type = "EVENT" if is_causal and is_event_source else "CHARACTER"
+                        target_type = "EVENT" if is_causal and is_event_target else "CHARACTER"
+                        
                         relationships.append({
                             "source": subject,
-                            "source_id": f"char_{subject.lower().replace(' ', '_')}",
+                            "source_id": self._make_entity_id(subject, source_type),
                             "target": obj_text,
-                            "target_id": f"char_{obj_text.lower().replace(' ', '_')}",
+                            "target_id": self._make_entity_id(obj_text, target_type),
                             "relation_type": rel_type,
                             "strength": strength,
-                            "confidence": 0.7,
+                            "confidence": 0.7 if not is_causal else 0.8,
                             "chapter": chapter,
                             "context": sent.text[:100],
                             "verb": token.lemma_
                         })
         
         return relationships
+
+    def _get_compound_span(self, token):
+        """Get the full span of a compound noun."""
+        min_i = token.i
+        max_i = token.i
+        
+        for child in token.children:
+            if child.dep_ in ("compound", "amod", "det") or (child.dep_ == "prep" and child.text == "of"):
+                 if child.i < token.i:
+                     min_i = min(min_i, child.i)
+                 # Handle "Assassination of the King"
+                 if child.dep_ == "prep" and child.text == "of":
+                     for grandchild in child.children:
+                         max_i = max(max_i, grandchild.i)
+        
+        return token.doc[min_i : max_i + 1]
+
+    def _is_potential_event(self, token) -> bool:
+        """Check if token could represent an event."""
+        event_nouns = {
+            "war", "battle", "fight", "assassination", "death", "birth", "wedding",
+            "ceremony", "explosion", "fire", "attack", "murder", "betrayal",
+            "crisis", "rebellion", "uprising", "fall", "collapse", "burning",
+            "destruction", "escape", "rescue", "meeting", "confrontation"
+        }
+        return token.lemma_.lower() in event_nouns or token.text[0].isupper()
     
     def _extract_pattern_relationships(self, text: str, chapter: int) -> List[Dict]:
         """Extract relationships using regex patterns."""
@@ -367,12 +428,18 @@ class NarrativeEntityExtractor:
                     source = groups[0]
                     target = groups[1]
                     
-                    if self._looks_like_entity(source) and self._looks_like_entity(target):
+                    # For causal relationships, allow broader matches
+                    is_causal = rel_type == "CAUSED_BY"
+                    
+                    if is_causal or (self._looks_like_entity(source) and self._looks_like_entity(target)):
+                        source_id = self._make_entity_id(source, "EVENT" if is_causal else "CHARACTER")
+                        target_id = self._make_entity_id(target, "EVENT" if is_causal else "CHARACTER")
+                        
                         relationships.append({
                             "source": source,
-                            "source_id": f"char_{source.lower().replace(' ', '_')}",
+                            "source_id": source_id,
                             "target": target,
-                            "target_id": f"char_{target.lower().replace(' ', '_')}",
+                            "target_id": target_id,
                             "relation_type": rel_type,
                             "strength": 0.8,
                             "confidence": confidence,
@@ -456,9 +523,11 @@ class NarrativeEntityExtractor:
     
     def _classify_relation(self, verb: str) -> str:
         """Map verbs to relationship types."""
-        verb_lower = verb.lower()
+        verb_lower = verb.strip().lower()
         
-        if verb_lower in self.conflict_verbs:
+        if verb_lower in self.causal_verbs:
+            return "CAUSED_BY"
+        elif verb_lower in self.conflict_verbs:
             return "CONFLICTS_WITH"
         elif verb_lower in self.alliance_verbs:
             return "ALLIES_WITH"
@@ -552,7 +621,8 @@ class NarrativeEntityExtractor:
     def extract_events(self, text: str, chapter: int = 1) -> List[Dict]:
         """
         Extract significant events from text.
-        Events are identified by action verbs with subjects and objects.
+        Events are identified by action verbs with subjects and objects,
+        or significant event nouns.
         """
         events = []
         
@@ -561,6 +631,38 @@ class NarrativeEntityExtractor:
         
         doc = self.nlp(text)
         
+        # 1. Event Nouns
+        event_nouns = {
+            "war", "battle", "fight", "assassination", "death", "birth", "wedding",
+            "ceremony", "explosion", "fire", "attack", "murder", "betrayal",
+            "crisis", "rebellion", "uprising", "fall", "collapse", "burning",
+            "destruction", "escape", "rescue", "meeting", "confrontation"
+        }
+        
+        # Scan for event nouns
+        for noun_chunk in doc.noun_chunks:
+            root_text = noun_chunk.root.text.lower()
+            if root_text in event_nouns:
+                # Use compound span to match relationship extraction logic
+                span = self._get_compound_span(noun_chunk.root)
+                event_id = self._make_entity_id(span.text, "EVENT")
+                
+                # Check for duplicates
+                if any(e['id'] == event_id for e in events):
+                    continue
+                    
+                events.append({
+                    "id": event_id,
+                    "type": "EVENT",
+                    "name": span.text,
+                    "description": noun_chunk.sent.text.strip(),
+                    "chapter": chapter,
+                    "action": root_text,
+                    "confidence": 0.8,
+                    "span": (span.start, span.end)
+                })
+
+        # 2. Verb-based events
         for sent in doc.sents:
             # Look for sentences with actionable content
             has_action = False
@@ -570,23 +672,33 @@ class NarrativeEntityExtractor:
                 if token.pos_ == "VERB" and token.lemma_ in {
                     "discover", "find", "create", "destroy", "reveal",
                     "attack", "defeat", "win", "lose", "escape", "capture",
-                    "meet", "arrive", "leave", "die", "born", "marry"
+                    "meet", "arrive", "leave", "die", "born", "marry",
+                    "cause", "lead", "trigger", "result"
                 }:
                     has_action = True
                     action_verb = token.lemma_
                     break
             
+            # Avoid duplicating if covered by noun event
             if has_action:
-                event_id = f"event_{chapter}_{len(events)}"
-                events.append({
-                    "id": event_id,
-                    "type": "EVENT",
-                    "name": f"{action_verb.capitalize()} event",
-                    "description": sent.text.strip(),
-                    "chapter": chapter,
-                    "action": action_verb,
-                    "confidence": 0.7
-                })
+                # Check if we already have an event for this sentence based on noun
+                if not any(e['description'] == sent.text.strip() for e in events):
+                    # Use a consistent naming for verb events, though linking is harder
+                    name = f"{action_verb.capitalize()} event"
+                    event_id = self._make_entity_id(name, "EVENT")
+                    
+                    if any(e['id'] == event_id for e in events):
+                        continue
+
+                    events.append({
+                        "id": event_id,
+                        "type": "EVENT",
+                        "name": name,
+                        "description": sent.text.strip(),
+                        "chapter": chapter,
+                        "action": action_verb,
+                        "confidence": 0.7
+                    })
         
         return events
     

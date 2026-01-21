@@ -79,6 +79,20 @@ class StoryKnowledgeGraph:
         self.chapter_timeline: Dict[int, List[str]] = {}  # chapter -> event IDs
         
         logger.info("StoryKnowledgeGraph initialized")
+    
+    @property
+    def entities(self) -> Dict[str, StoryEntity]:
+        """Property alias for entity_index for compatibility."""
+        return self.entity_index
+    
+    def get_all_entities(self) -> List[StoryEntity]:
+        """Get all entities as a list."""
+        return list(self.entity_index.values())
+    
+    def get_entities_by_type(self, entity_type: str) -> List[StoryEntity]:
+        """Get all entities of a specific type."""
+        return [e for e in self.entity_index.values() if e.type == entity_type]
+    
         
     def add_entity(self, entity: StoryEntity) -> None:
         """

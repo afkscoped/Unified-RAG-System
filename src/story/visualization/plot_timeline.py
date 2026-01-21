@@ -442,6 +442,132 @@ class PlotTimelineVisualizer:
         else:
             return "very_fast"
     
+    def create_character_arc_chart(
+        self,
+        arc_tracker=None,
+        height: int = 400,
+        width: int = 900
+    ) -> Optional[go.Figure]:
+        """
+        Create character arc visualization showing emotional states across chapters.
+        
+        Args:
+            arc_tracker: DynamicArcTracker with character timeline data
+            height: Figure height
+            width: Figure width
+            
+        Returns:
+            Plotly Figure with character arc lines
+        """
+        if not PLOTLY_AVAILABLE:
+            return None
+        
+        if not arc_tracker or not hasattr(arc_tracker, 'character_timelines'):
+            return self._empty_figure("No character arc data available", height, width)
+        
+        timelines = arc_tracker.character_timelines
+        if not timelines:
+            return self._empty_figure("No characters tracked yet", height, width)
+        
+        # Emotional state to numeric mapping for visualization
+        EMOTION_VALUES = {
+            "hopeful": 0.8,
+            "excited": 0.9,
+            "happy": 0.85,
+            "neutral": 0.5,
+            "uncertain": 0.4,
+            "conflicted": 0.35,
+            "angry": 0.3,
+            "desperate": 0.15,
+            "terrified": 0.1,
+        }
+        
+        # Arc phase colors
+        PHASE_COLORS = {
+            "setup": "#3498db",
+            "rising_action": "#f39c12",
+            "crisis": "#e74c3c",
+            "climax": "#9b59b6",
+            "resolution": "#27ae60"
+        }
+        
+        # Color palette for characters
+        CHARACTER_COLORS = [
+            "#3498db", "#e74c3c", "#27ae60", "#f39c12", "#9b59b6",
+            "#1abc9c", "#e84393", "#00b894", "#fdcb6e", "#6c5ce7"
+        ]
+        
+        traces = []
+        
+        for idx, (char_id, states) in enumerate(timelines.items()):
+            if not states:
+                continue
+            
+            # Get character name
+            char_name = char_id.replace('_', ' ').title()
+            if hasattr(arc_tracker, 'story_graph') and arc_tracker.story_graph:
+                entity = arc_tracker.story_graph.get_entity(char_id)
+                if entity:
+                    char_name = entity.name
+            
+            chapters = []
+            emotions = []
+            hovers = []
+            
+            for state in sorted(states, key=lambda s: s.chapter):
+                chapters.append(state.chapter)
+                emotion_val = EMOTION_VALUES.get(
+                    state.emotional_state.lower(), 0.5
+                )
+                emotions.append(emotion_val)
+                
+                hover = f"<b>{char_name}</b><br>"
+                hover += f"Chapter {state.chapter}<br>"
+                hover += f"Emotion: {state.emotional_state}<br>"
+                hover += f"Phase: {state.arc_phase}<br>"
+                if state.goals:
+                    hover += f"Goals: {', '.join(state.goals[:2])}"
+                hovers.append(hover)
+            
+            color = CHARACTER_COLORS[idx % len(CHARACTER_COLORS)]
+            
+            # Line trace
+            traces.append(go.Scatter(
+                x=chapters,
+                y=emotions,
+                mode='lines+markers',
+                name=char_name,
+                line=dict(color=color, width=2),
+                marker=dict(size=10, color=color),
+                hovertext=hovers,
+                hoverinfo='text'
+            ))
+        
+        if not traces:
+            return self._empty_figure("No character state data", height, width)
+        
+        fig = go.Figure(data=traces)
+        
+        # Add emotion labels on y-axis
+        fig.update_layout(
+            title="Character Emotional Arc",
+            xaxis_title="Chapter",
+            yaxis_title="Emotional State",
+            height=height,
+            width=width,
+            showlegend=True,
+            legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
+            xaxis=dict(tickmode='linear', tick0=1, dtick=1),
+            yaxis=dict(
+                tickmode='array',
+                tickvals=[0.1, 0.3, 0.5, 0.7, 0.9],
+                ticktext=["Desperate", "Angry", "Neutral", "Hopeful", "Excited"],
+                range=[0, 1]
+            )
+        )
+        
+        return fig
+    
     def _empty_figure(self, message: str, height: int, width: int) -> go.Figure:
         """Create empty figure with message."""
         fig = go.Figure()

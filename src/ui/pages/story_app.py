@@ -34,6 +34,10 @@ st.set_page_config(
     layout="wide"
 )
 
+# Load Cyberpunk Theme
+from src.ui.styles.cyberpunk_theme import load_cyberpunk_theme
+load_cyberpunk_theme()
+
 # Custom CSS
 st.markdown("""
 <style>
@@ -142,11 +146,12 @@ def render_sidebar():
         
         # Tab navigation
         st.subheader("📑 Views")
-        tab_options = ["🎬 Generation", "📊 Visualization", "⭐ Feedback", "📈 Analytics"]
+        tab_options = ["🎬 Generation", "📊 Visualization", "🔍 Analysis", "⭐ Feedback", "📈 Analytics"]
         selected = st.radio("Navigate to:", tab_options, label_visibility="collapsed")
         st.session_state.active_tab = {
             "🎬 Generation": "generation",
-            "📊 Visualization": "visualization", 
+            "📊 Visualization": "visualization",
+            "🔍 Analysis": "analysis",
             "⭐ Feedback": "feedback",
             "📈 Analytics": "analytics"
         }[selected]
@@ -201,7 +206,7 @@ def render_generation_tab():
         key="story_prompt_input"
     )
     
-    col1, col2, col3, col4 = st.columns([3, 1, 1, 1])
+    col1, col2, col3, col4, col5 = st.columns([3, 1, 1, 1, 1])
     with col1:
         generate_btn = st.button("🎬 Generate", type="primary", use_container_width=True)
     with col2:
@@ -210,6 +215,8 @@ def render_generation_tab():
         suggestions_btn = st.button("💡 Suggestions", use_container_width=True)
     with col4:
         export_btn = st.button("📥 Export", use_container_width=True)
+    with col5:
+        bootstrap_btn = st.button("🚀 Load Demo", use_container_width=True)
     
     if continue_btn:
         st.session_state.current_chapter += 1
@@ -217,6 +224,18 @@ def render_generation_tab():
     
     if export_btn:
         export_story()
+    
+    # Bootstrap with sample data
+    if bootstrap_btn:
+        with st.spinner("Loading sample story data..."):
+            try:
+                result = st.session_state.comparison_engine.bootstrap_sample_story()
+                st.success(f"✅ {result.get('message', 'Sample data loaded!')}")
+                st.info(f"Added: {result.get('entities_added', 0)} entities, "
+                       f"{result.get('relationships_added', 0)} relationships, "
+                       f"{result.get('tropes_detected', 0)} tropes detected")
+            except Exception as e:
+                st.error(f"Bootstrap failed: {e}")
     
     # Show plot suggestions
     if suggestions_btn:
@@ -274,6 +293,11 @@ def render_results(results: Dict):
     if "graph" in results:
         st.divider()
         render_entities_and_relationships(results["graph"])
+    
+    # Potential Plot Holes section
+    st.divider()
+    render_potential_plot_holes()
+
 
 
 def render_comparison_results(results: Dict):
@@ -324,8 +348,8 @@ def render_metrics_row(metrics):
 
 
 def render_coherence_breakdown(results: Dict):
-    """Render coherence breakdown with radar chart."""
-    st.subheader("🎯 Coherence Analysis")
+    """Render coherence breakdown with radar chart (5 dimensions)."""
+    st.subheader("🎯 Multi-Dimensional Coherence Analysis")
     
     try:
         import plotly.graph_objects as go
@@ -337,13 +361,14 @@ def render_coherence_breakdown(results: Dict):
                 hybrid_text, "", st.session_state.current_chapter
             )
             
-            # Radar chart
-            categories = ['Semantic', 'Lexical', 'Discourse', 'Temporal']
+            # Radar chart with 5 dimensions
+            categories = ['Semantic', 'Lexical', 'Discourse', 'Temporal', 'Voice']
             values = [
                 coherence.get("semantic", 0),
                 coherence.get("lexical", 0),
                 coherence.get("discourse", 0),
-                coherence.get("temporal", 0)
+                coherence.get("temporal", 0),
+                coherence.get("voice", 0)
             ]
             values.append(values[0])  # Close the radar
             
@@ -351,15 +376,16 @@ def render_coherence_breakdown(results: Dict):
                 r=values,
                 theta=categories + [categories[0]],
                 fill='toself',
-                line_color='#667eea'
+                line_color='#667eea',
+                fillcolor='rgba(102, 126, 234, 0.3)'
             ))
             fig.update_layout(
                 polar=dict(
                     radialaxis=dict(visible=True, range=[0, 1])
                 ),
                 showlegend=False,
-                height=300,
-                margin=dict(l=50, r=50, t=30, b=30)
+                height=350,
+                margin=dict(l=60, r=60, t=30, b=30)
             )
             
             col1, col2 = st.columns([1, 2])
@@ -369,9 +395,63 @@ def render_coherence_breakdown(results: Dict):
                 st.markdown("**Dimension Scores:**")
                 for cat, val in zip(categories, values[:-1]):
                     st.progress(val, text=f"{cat}: {val:.0%}")
+                st.divider()
                 st.metric("Composite Score", f"{coherence.get('composite', 0):.0%}")
+                
+            # Bar chart comparison across approaches
+            render_coherence_comparison_chart(results)
     except Exception as e:
         st.warning(f"Could not render coherence analysis: {e}")
+
+
+def render_coherence_comparison_chart(results: Dict):
+    """Render bar chart comparing coherence across all approaches."""
+    try:
+        import plotly.graph_objects as go
+        
+        engine = st.session_state.comparison_engine
+        if not engine:
+            return
+        
+        approaches = ["Unified", "Graph", "Hybrid"]
+        keys = ["unified", "graph", "hybrid"]
+        dimensions = ["semantic", "lexical", "discourse", "temporal", "voice"]
+        colors = ['#3498db', '#27ae60', '#9b59b6', '#e74c3c', '#f39c12']
+        
+        # Collect coherence scores for each approach
+        data = {dim: [] for dim in dimensions}
+        
+        for key in keys:
+            text = results.get(key, {}).get("text", "")
+            if text:
+                coherence = engine.analyze_coherence(text, "", st.session_state.current_chapter)
+                for dim in dimensions:
+                    data[dim].append(coherence.get(dim, 0))
+            else:
+                for dim in dimensions:
+                    data[dim].append(0)
+        
+        # Create grouped bar chart
+        fig = go.Figure()
+        for i, dim in enumerate(dimensions):
+            fig.add_trace(go.Bar(
+                name=dim.title(),
+                x=approaches,
+                y=data[dim],
+                marker_color=colors[i]
+            ))
+        
+        fig.update_layout(
+            title="Coherence by Dimension & Approach",
+            barmode='group',
+            yaxis=dict(range=[0, 1], title="Score"),
+            height=350,
+            legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="center", x=0.5)
+        )
+        
+        st.plotly_chart(fig, use_container_width=True)
+    except Exception as e:
+        st.caption(f"Comparison chart unavailable: {e}")
 
 
 def render_consistency_comparison(results: Dict):
@@ -448,6 +528,47 @@ def render_entities_and_relationships(graph_result: Dict):
             st.info("No relationships extracted yet")
 
 
+def render_potential_plot_holes():
+    """Render potential plot holes section on the Generation tab."""
+    st.subheader("🕳️ Potential Plot Holes")
+    
+    engine = st.session_state.comparison_engine
+    if not engine:
+        st.info("Generate a story to detect potential plot holes.")
+        return
+    
+    try:
+        result = engine.detect_plot_holes()
+        
+        col1, col2, col3, col4 = st.columns(4)
+        with col1:
+            health = result.get("story_health", "Unknown")
+            health_icon = "🌟" if health == "Excellent" else "✅" if health == "Good" else "⚠️" if health == "Fair" else "🔴"
+            st.metric("Story Health", f"{health} {health_icon}")
+        with col2:
+            st.metric("Total Issues", result.get("total_issues", 0))
+        with col3:
+            st.metric("High Severity", result.get("by_severity", {}).get("high", 0))
+        with col4:
+            st.metric("Medium Severity", result.get("by_severity", {}).get("medium", 0))
+        
+        issues = result.get("issues", [])
+        if issues:
+            st.markdown("**Detected Issues:**")
+            for issue in issues[:5]:
+                severity_color = "🔴" if issue["severity"] == "high" else "🟡" if issue["severity"] == "medium" else "🟢"
+                with st.expander(f"{severity_color} {issue['type'].replace('_', ' ').title()}"):
+                    st.write(issue["description"])
+                    st.info(f"💡 Suggestion: {issue['suggestion']}")
+                    if issue.get("chapter"):
+                        st.caption(f"Chapter {issue['chapter']}")
+        else:
+            st.success("✅ No plot holes detected! Your story is consistent.")
+    
+    except Exception as e:
+        st.warning(f"Plot hole detection unavailable: {e}")
+
+
 def render_plot_suggestions():
     """Render plot suggestions with Use This buttons."""
     st.subheader("💡 Plot Suggestions")
@@ -477,40 +598,49 @@ def render_plot_suggestions():
 
 
 def render_visualization_tab():
-    """Render the visualization tab with graphs and timeline."""
+    """Render the visualization tab with graphs, timeline, and new features."""
     st.title("📊 Story Visualization")
     
     engine = st.session_state.comparison_engine
     if not engine:
-        st.warning("Initialize the engine first by generating a story.")
+        st.warning("Initialize the engine first by generating a story or loading demo data.")
         return
     
+    # Visualization selector with new options
     viz_type = st.selectbox(
         "Select Visualization",
-        ["Knowledge Graph", "Character Network", "Event Chain", "Location Map", "Plot Timeline"]
+        ["Knowledge Graph", "Character Network", "Character Arc Journey", 
+         "Event Chain", "Location Map", "Plot Timeline", "Metrics Comparison"]
     )
     
     try:
+        fig = None
+        
         if viz_type == "Knowledge Graph":
             fig = engine.create_graph_visualization("full")
         elif viz_type == "Character Network":
             fig = engine.create_graph_visualization("characters")
+        elif viz_type == "Character Arc Journey":
+            fig = engine.create_arc_visualization()
         elif viz_type == "Event Chain":
             fig = engine.create_graph_visualization("events")
         elif viz_type == "Location Map":
             fig = engine.create_graph_visualization("locations")
         elif viz_type == "Plot Timeline":
             fig = engine.create_timeline_visualization()
+        elif viz_type == "Metrics Comparison":
+            render_metrics_comparison()
+            return
         
         if fig:
             st.plotly_chart(fig, use_container_width=True)
         else:
-            st.info("No data available for this visualization yet. Generate more story content!")
+            st.info("No data available for this visualization yet. Generate more story content or load demo data!")
     
     except Exception as e:
         st.error(f"Visualization error: {e}")
     
-    # Timeline analysis
+    # Timeline/Structure analysis
     if viz_type == "Plot Timeline":
         st.divider()
         st.subheader("📈 Story Structure Analysis")
@@ -530,6 +660,278 @@ def render_visualization_tab():
                     st.success("No plot holes detected!")
         except Exception as e:
             st.warning(f"Analysis unavailable: {e}")
+    
+    # Trope Analysis section (always shown)
+    st.divider()
+    render_trope_analysis()
+
+
+def render_metrics_comparison():
+    """Render bar chart comparing metrics across approaches."""
+    st.subheader("📊 Approach Metrics Comparison")
+    
+    if not st.session_state.last_results:
+        st.info("Generate a story first to compare metrics!")
+        return
+    
+    try:
+        import plotly.graph_objects as go
+        
+        results = st.session_state.last_results
+        approaches = ["Unified RAG", "Graph RAG", "Hybrid Fusion"]
+        keys = ["unified", "graph", "hybrid"]
+        
+        # Extract metrics
+        coherence = []
+        consistency = []
+        response_time = []
+        
+        for key in keys:
+            metrics = results.get(key, {}).get("metrics")
+            if metrics:
+                m = metrics.to_dict() if hasattr(metrics, 'to_dict') else metrics
+                coherence.append(m.get("coherence_score", 0))
+                consistency.append(m.get("consistency_score", 0))
+                response_time.append(m.get("response_time", 0))
+            else:
+                coherence.append(0)
+                consistency.append(0)
+                response_time.append(0)
+        
+        # Create grouped bar chart
+        fig = go.Figure(data=[
+            go.Bar(name='Coherence', x=approaches, y=coherence, marker_color='#3498db'),
+            go.Bar(name='Consistency', x=approaches, y=consistency, marker_color='#27ae60'),
+        ])
+        
+        fig.update_layout(
+            title="Quality Metrics by Approach",
+            yaxis_title="Score (0-1)",
+            barmode='group',
+            height=400,
+            yaxis=dict(range=[0, 1])
+        )
+        
+        st.plotly_chart(fig, use_container_width=True)
+        
+        # Response time chart
+        fig2 = go.Figure(data=[
+            go.Bar(x=approaches, y=response_time, marker_color=['#11998e', '#667eea', '#f5576c'])
+        ])
+        fig2.update_layout(
+            title="Response Time Comparison",
+            yaxis_title="Time (seconds)",
+            height=300
+        )
+        st.plotly_chart(fig2, use_container_width=True)
+        
+    except Exception as e:
+        st.warning(f"Could not render metrics chart: {e}")
+
+
+def render_trope_analysis():
+    """Render trope detection and thematic analysis."""
+    st.subheader("🎭 Trope & Theme Analysis")
+    
+    engine = st.session_state.comparison_engine
+    if not engine:
+        return
+    
+    try:
+        summary = engine.get_thematic_summary()
+        
+        if summary.get("status") == "insufficient_data":
+            st.info(summary.get("message", "Generate more story content to detect themes."))
+            return
+        
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            st.metric("Total Tropes Detected", summary.get("total_tropes", 0))
+            st.metric("Narrative Style", summary.get("narrative_style", "Unknown"))
+            st.metric("Dominant Theme", summary.get("dominant_theme", "-").replace('_', ' ').title())
+        
+        with col2:
+            # Category distribution
+            categories = summary.get("categories", {})
+            if categories:
+                st.markdown("**Theme Categories:**")
+                for cat, count in categories.items():
+                    st.progress(min(1.0, count / 5), text=f"{cat.replace('_', ' ').title()}: {count}")
+        
+        # Top tropes
+        top_tropes = summary.get("top_tropes", [])
+        if top_tropes:
+            st.markdown("**Detected Tropes:**")
+            for trope in top_tropes[:5]:
+                with st.expander(f"🎬 {trope.get('name', '').replace('_', ' ').title()} ({trope.get('confidence', 0):.0%})"):
+                    st.write(trope.get("description", ""))
+                    if trope.get("evidence"):
+                        st.caption("Evidence: " + trope.get("evidence", [""])[0][:100] + "...")
+                    if trope.get("involved_entities"):
+                        st.caption(f"Characters: {', '.join(trope.get('involved_entities', []))}")
+        
+        # Suggestions
+        suggestions = summary.get("suggestions", [])
+        if suggestions:
+            st.markdown("**💡 Narrative Suggestions:**")
+            for sug in suggestions:
+                st.info(sug)
+    
+    except Exception as e:
+        st.warning(f"Trope analysis unavailable: {e}")
+
+
+def render_analysis_tab():
+    """Render the advanced story analysis tab."""
+    st.title("🔍 Story Analysis")
+    
+    engine = st.session_state.comparison_engine
+    if not engine:
+        st.warning("Initialize the engine first by generating a story or loading demo data.")
+        return
+    
+    # Analysis type selector
+    analysis_type = st.selectbox(
+        "Select Analysis",
+        ["Plot Hole Detection", "Foreshadowing Tracker", "Narrative Pacing", "Feedback Influence"]
+    )
+    
+    try:
+        if analysis_type == "Plot Hole Detection":
+            st.subheader("🕳️ Plot Hole Detection")
+            result = engine.detect_plot_holes()
+            
+            # Health status
+            col1, col2, col3, col4 = st.columns(4)
+            with col1:
+                st.metric("Story Health", result.get("story_health", "Unknown"))
+            with col2:
+                st.metric("Total Issues", result.get("total_issues", 0))
+            with col3:
+                st.metric("High Severity", result.get("by_severity", {}).get("high", 0))
+            with col4:
+                st.metric("Medium Severity", result.get("by_severity", {}).get("medium", 0))
+            
+            # Issues list
+            issues = result.get("issues", [])
+            if issues:
+                st.divider()
+                st.markdown("**Detected Issues:**")
+                for issue in issues[:10]:
+                    severity_color = "🔴" if issue["severity"] == "high" else "🟡" if issue["severity"] == "medium" else "🟢"
+                    with st.expander(f"{severity_color} {issue['type'].replace('_', ' ').title()}"):
+                        st.write(issue["description"])
+                        st.info(f"💡 Suggestion: {issue['suggestion']}")
+                        if issue.get("chapter"):
+                            st.caption(f"Chapter {issue['chapter']}")
+            else:
+                st.success("✅ No plot holes detected! Your story is consistent.")
+        
+        elif analysis_type == "Foreshadowing Tracker":
+            st.subheader("🔮 Foreshadowing Tracker")
+            result = engine.track_foreshadowing()
+            
+            col1, col2, col3 = st.columns(3)
+            with col1:
+                st.metric("Total Planted", result.get("total", 0))
+            with col2:
+                st.metric("Resolved", result.get("resolved", 0))
+            with col3:
+                st.metric("Pending", result.get("pending", 0))
+            
+            pending_items = result.get("pending_items", [])
+            if pending_items:
+                st.divider()
+                st.markdown("**Pending Foreshadowing to Resolve:**")
+                for item in pending_items:
+                    st.warning(f"Ch.{item['chapter']}: '{item['pattern']}' - {item['hint'][:60]}...")
+            
+            suggestions = result.get("suggestions", [])
+            if suggestions:
+                st.divider()
+                st.markdown("**Suggestions:**")
+                for sug in suggestions:
+                    st.info(sug)
+        
+        elif analysis_type == "Narrative Pacing":
+            st.subheader("📊 Narrative Pacing Analysis")
+            result = engine.analyze_narrative_pacing()
+            
+            chapters = result.get("chapters", [])
+            if chapters:
+                import plotly.graph_objects as go
+                
+                fig = go.Figure()
+                fig.add_trace(go.Scatter(
+                    x=[c["chapter"] for c in chapters],
+                    y=[c["tension_level"] for c in chapters],
+                    mode='lines+markers',
+                    name='Tension Level',
+                    line=dict(color='#e74c3c', width=2),
+                    marker=dict(size=10)
+                ))
+                fig.update_layout(
+                    title="Tension Curve Across Chapters",
+                    xaxis_title="Chapter",
+                    yaxis_title="Tension Level",
+                    yaxis=dict(range=[0, 1]),
+                    height=400
+                )
+                st.plotly_chart(fig, use_container_width=True)
+                
+                # Pacing breakdown
+                st.divider()
+                st.markdown("**Pacing by Chapter:**")
+                for ch in chapters:
+                    pacing = ch["pacing"]
+                    icon = "🔥" if pacing == "intense" else "😴" if pacing == "slow" else "⚖️"
+                    st.markdown(f"Ch.{ch['chapter']}: {icon} {pacing.title()} (tension: {ch['tension_level']:.0%})")
+                
+                # Issues
+                issues = result.get("pacing_issues", [])
+                if issues:
+                    st.divider()
+                    st.warning("**Pacing Issues:**")
+                    for issue in issues:
+                        st.write(f"⚠️ {issue}")
+            else:
+                st.info("Generate story content to analyze pacing.")
+        
+        elif analysis_type == "Feedback Influence":
+            st.subheader("🎯 Feedback Influence Dashboard")
+            result = engine.get_feedback_influence()
+            
+            col1, col2 = st.columns(2)
+            with col1:
+                st.metric("Feedback Count", result.get("feedback_count", 0))
+                st.metric("Recommended Approach", result.get("recommended_approach", "hybrid").title())
+            
+            with col2:
+                weights = result.get("current_weights", {})
+                st.markdown("**Current Weights:**")
+                st.progress(weights.get("unified", 0.33), text=f"Unified: {weights.get('unified', 0.33):.0%}")
+                st.progress(weights.get("graph", 0.33), text=f"Graph: {weights.get('graph', 0.33):.0%}")
+                st.progress(weights.get("hybrid", 0.34), text=f"Hybrid: {weights.get('hybrid', 0.34):.0%}")
+            
+            st.divider()
+            st.markdown(f"**Summary:** {result.get('influence', 'No feedback yet.')}")
+            
+            performance = result.get("performance_scores", {})
+            if performance:
+                st.divider()
+                st.markdown("**Performance by Approach:**")
+                import plotly.graph_objects as go
+                fig = go.Figure(data=[
+                    go.Bar(x=list(performance.keys()), y=list(performance.values()), marker_color=['#3498db', '#27ae60', '#9b59b6'])
+                ])
+                fig.update_layout(title="Average Ratings", yaxis_title="Rating", height=300)
+                st.plotly_chart(fig, use_container_width=True)
+    
+    except Exception as e:
+        st.error(f"Analysis error: {e}")
+        import traceback
+        st.code(traceback.format_exc())
 
 
 def render_feedback_tab():
@@ -673,6 +1075,8 @@ def main():
         render_generation_tab()
     elif tab == "visualization":
         render_visualization_tab()
+    elif tab == "analysis":
+        render_analysis_tab()
     elif tab == "feedback":
         render_feedback_tab()
     elif tab == "analytics":
