@@ -29,11 +29,12 @@ from loguru import logger
 
 from src.core.rag_system import UnifiedRAGSystem, RAGConfig
 from src.api.story_api import story_router, set_comparison_engine
-
+from src.meta_analysis.api.router import router as meta_router
 
 # Global instances
 rag_system: Optional[UnifiedRAGSystem] = None
 comparison_engine = None
+
 
 
 @asynccontextmanager
@@ -56,6 +57,7 @@ async def lifespan(app: FastAPI):
             from src.llm.llm_router import LLMRouter
             
             llm_router = LLMRouter()
+            app.state.llm_router = llm_router
             comparison_engine = StoryComparisonEngine(
                 unified_rag_system=rag_system,
                 llm_router=llm_router,
@@ -94,6 +96,8 @@ app.add_middleware(
 
 # Include Story Mode router
 app.include_router(story_router, prefix="/story", tags=["Story Mode"])
+app.include_router(meta_router)
+
 
 
 # ─────────────────────────────────────────────────────────────────────────────

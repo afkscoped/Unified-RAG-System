@@ -1,0 +1,4 @@
+experiment_name,control_conversions,control_total,treatment_conversions,treatment_total,date,metric
+Email - Subject Line A vs B,120,5000,150,5100,2025-01-01,Open Rate
+Email - CTA Button Color,85,2000,95,2050,2025-01-05,Click Through Rate
+Email - Personalization,210,8000,245,8000,2025-01-20,Conversion

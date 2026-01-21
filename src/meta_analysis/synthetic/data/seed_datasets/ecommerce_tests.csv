@@ -1,0 +1,101 @@
+experiment_id,experiment_name,variant,control_visitors,control_conversions,variant_visitors,variant_conversions,test_duration_days,platform,conversion_rate,avg_order_value,device_type,user_type,region
+checkout_ecom_0001,Checkout Flow A/B,A/B,12500,375,12800,422,14,web,0.032,89.50,desktop,returning,US
+checkout_ecom_0002,Checkout Optimization,A/B,8900,267,9100,318,21,web,0.034,75.20,mobile,new,EU
+product_ecom_0003,Product Page Test,A/B,15600,468,15200,502,18,web,0.031,112.00,desktop,returning,US
+cart_ecom_0004,Cart Abandonment,A/B,22000,440,21500,516,28,web,0.023,95.80,mobile,new,APAC
+homepage_ecom_0005,Homepage Banner,A/B,45000,1350,44500,1513,14,web,0.033,68.40,tablet,returning,EU
+search_ecom_0006,Search Results,A/B,18000,540,17800,587,21,web,0.032,82.30,desktop,new,US
+checkout_ecom_0007,One-Click Checkout,A/B,9500,285,9800,343,14,web,0.034,105.60,mobile,returning,LATAM
+product_ecom_0008,Image Gallery,A/B,11200,336,11000,374,28,web,0.033,92.10,desktop,new,EU
+cart_ecom_0009,Cart Summary,A/B,16800,504,16500,545,21,web,0.032,78.90,mobile,returning,US
+homepage_ecom_0010,Navigation Update,A/B,38000,1140,37500,1275,14,web,0.031,84.20,tablet,new,APAC
+search_ecom_0011,Autocomplete,A/B,25000,750,24800,868,18,web,0.034,71.50,desktop,returning,US
+checkout_ecom_0012,Payment Options,A/B,7800,234,8000,280,21,web,0.034,118.30,mobile,new,EU
+product_ecom_0013,Reviews Display,A/B,13500,405,13200,449,14,web,0.032,96.40,desktop,returning,LATAM
+cart_ecom_0014,Upsell Widget,A/B,19500,585,19000,646,28,web,0.033,88.70,mobile,new,US
+homepage_ecom_0015,Hero Section,A/B,52000,1560,51500,1751,14,web,0.033,65.80,tablet,returning,EU
+search_ecom_0016,Filter Options,A/B,21000,630,20500,697,21,web,0.033,79.60,desktop,new,APAC
+checkout_ecom_0017,Guest Checkout,A/B,6500,195,6800,231,18,web,0.033,102.40,mobile,returning,US
+product_ecom_0018,Size Guide,A/B,10800,324,10500,357,14,web,0.033,91.20,desktop,new,EU
+cart_ecom_0019,Discount Display,A/B,14200,426,13900,459,21,web,0.032,85.30,mobile,returning,LATAM
+homepage_ecom_0020,Category Cards,A/B,42000,1260,41500,1411,14,web,0.032,72.90,tablet,new,US
+search_ecom_0021,Sort Options,A/B,23500,705,23000,782,28,web,0.033,76.40,desktop,returning,EU
+checkout_ecom_0022,Express Checkout,A/B,8200,246,8500,289,14,web,0.033,125.60,mobile,new,APAC
+product_ecom_0023,Stock Indicator,A/B,12000,360,11800,401,21,web,0.033,94.80,desktop,returning,US
+cart_ecom_0024,Free Shipping Bar,A/B,17500,525,17000,578,18,web,0.033,81.50,mobile,new,EU
+homepage_ecom_0025,Promo Banner,A/B,48000,1440,47500,1615,14,web,0.033,69.20,tablet,returning,LATAM
+search_ecom_0026,Visual Search,A/B,15500,465,15200,516,21,web,0.033,87.30,desktop,new,US
+checkout_ecom_0027,Address Autofill,A/B,7200,216,7500,255,28,web,0.033,108.90,mobile,returning,EU
+product_ecom_0028,360 View,A/B,9800,294,9600,326,14,web,0.033,115.40,desktop,new,APAC
+cart_ecom_0029,Save For Later,A/B,13800,414,13500,459,21,web,0.033,83.60,mobile,returning,US
+homepage_ecom_0030,Personalization,A/B,55000,1650,54500,1853,14,web,0.033,74.80,tablet,new,EU
+search_ecom_0031,Voice Search,A/B,11500,345,11200,381,18,web,0.033,78.20,desktop,returning,LATAM
+checkout_ecom_0032,Trust Badges,A/B,9100,273,9400,319,14,web,0.033,98.70,mobile,new,US
+product_ecom_0033,Video Demo,A/B,14500,435,14200,483,21,web,0.033,104.30,desktop,returning,EU
+cart_ecom_0034,Quantity Selector,A/B,20500,615,20000,680,28,web,0.033,86.90,mobile,new,APAC
+homepage_ecom_0035,Featured Products,A/B,36000,1080,35500,1207,14,web,0.033,71.40,tablet,returning,US
+search_ecom_0036,Related Products,A/B,27500,825,27000,918,21,web,0.033,80.50,desktop,new,EU
+checkout_ecom_0037,Mobile Payment,A/B,5800,174,6100,207,14,web,0.033,132.80,mobile,returning,LATAM
+product_ecom_0038,Comparison Tool,A/B,8400,252,8200,279,18,web,0.033,99.60,desktop,new,US
+cart_ecom_0039,Mini Cart,A/B,16200,486,15800,537,21,web,0.033,82.40,mobile,returning,EU
+homepage_ecom_0040,Quick View,A/B,41000,1230,40500,1377,14,web,0.033,73.10,tablet,new,APAC
+checkout_ecom_0041,Shipping Calculator,A/B,10500,315,10200,347,28,web,0.032,95.20,desktop,returning,US
+product_ecom_0042,Wishlist Button,A/B,13000,390,12700,432,14,web,0.033,88.50,mobile,new,EU
+cart_ecom_0043,Cross-sell Widget,A/B,18500,555,18000,612,21,web,0.033,79.80,desktop,returning,LATAM
+homepage_ecom_0044,Deal Timer,A/B,32000,960,31500,1071,14,web,0.033,67.90,tablet,new,US
+search_ecom_0045,Infinite Scroll,A/B,29000,870,28500,969,18,web,0.033,75.60,desktop,returning,EU
+checkout_ecom_0046,Coupon Field,A/B,7600,228,7900,268,14,web,0.033,110.40,mobile,new,APAC
+product_ecom_0047,Trust Signals,A/B,11800,354,11500,391,21,web,0.033,93.70,desktop,returning,US
+cart_ecom_0048,Edit Cart Modal,A/B,15000,450,14700,500,28,web,0.033,84.80,mobile,new,EU
+homepage_ecom_0049,Category Menu,A/B,44000,1320,43500,1479,14,web,0.033,70.30,tablet,returning,LATAM
+search_ecom_0050,Price Filter,A/B,24500,735,24000,816,21,web,0.033,77.50,desktop,new,US
+checkout_ecom_0051,Order Summary,A/B,8800,264,9100,309,14,web,0.033,101.20,mobile,returning,EU
+product_ecom_0052,Zoom Feature,A/B,10200,306,9900,337,18,web,0.033,97.40,desktop,new,APAC
+cart_ecom_0053,Promo Code Area,A/B,14800,444,14500,493,21,web,0.033,81.90,mobile,returning,US
+homepage_ecom_0054,Social Proof,A/B,39000,1170,38500,1309,14,web,0.033,72.60,tablet,new,EU
+search_ecom_0055,Brand Filter,A/B,22500,675,22000,748,28,web,0.033,78.80,desktop,returning,LATAM
+checkout_ecom_0056,Billing Address,A/B,6900,207,7200,245,14,web,0.033,115.70,mobile,new,US
+product_ecom_0057,Bundle Deals,A/B,12500,375,12200,415,21,web,0.033,106.50,desktop,returning,EU
+cart_ecom_0058,Tax Calculator,A/B,17200,516,16800,571,14,web,0.033,83.20,mobile,new,APAC
+homepage_ecom_0059,Newsletter Popup,A/B,47000,1410,46500,1581,18,web,0.033,68.70,tablet,returning,US
+search_ecom_0060,Color Filter,A/B,20000,600,19500,663,21,web,0.033,80.10,desktop,new,EU
+checkout_ecom_0061,Gift Options,A/B,5500,165,5800,197,28,web,0.033,138.90,mobile,returning,LATAM
+product_ecom_0062,Availability Check,A/B,9200,276,8900,302,14,web,0.033,92.80,desktop,new,US
+cart_ecom_0063,Loyalty Points,A/B,13500,405,13200,449,21,web,0.033,85.60,mobile,returning,EU
+homepage_ecom_0064,Trending Now,A/B,35000,1050,34500,1173,14,web,0.033,74.30,tablet,new,APAC
+search_ecom_0065,Size Filter,A/B,26000,780,25500,867,18,web,0.033,76.90,desktop,returning,US
+checkout_ecom_0066,Delivery Slots,A/B,7100,213,7400,251,14,web,0.033,121.50,mobile,new,EU
+product_ecom_0067,Color Selector,A/B,11500,345,11200,381,21,web,0.033,98.20,desktop,returning,LATAM
+cart_ecom_0068,Gift Message,A/B,16500,495,16000,544,28,web,0.033,82.70,mobile,new,US
+homepage_ecom_0069,Recently Viewed,A/B,43000,1290,42500,1445,14,web,0.033,71.80,tablet,returning,EU
+search_ecom_0070,Review Filter,A/B,19000,570,18500,629,21,web,0.033,79.40,desktop,new,APAC
+checkout_ecom_0071,Installments,A/B,8500,255,8800,299,14,web,0.033,145.60,mobile,returning,US
+product_ecom_0072,Qty Discount,A/B,10800,324,10500,357,18,web,0.033,108.30,desktop,new,EU
+cart_ecom_0073,Shipping Options,A/B,15500,465,15200,517,21,web,0.033,84.10,mobile,returning,LATAM
+homepage_ecom_0074,App Download,A/B,50000,1500,49500,1683,14,web,0.033,66.50,tablet,new,US
+search_ecom_0075,Category Tree,A/B,28000,840,27500,935,28,web,0.033,77.20,desktop,returning,EU
+checkout_ecom_0076,Promo Banner,A/B,6200,186,6500,221,14,web,0.033,128.40,mobile,new,APAC
+product_ecom_0077,Size Chart,A/B,14000,420,13700,466,21,web,0.033,95.90,desktop,returning,US
+cart_ecom_0078,Checkout CTA,A/B,18000,540,17500,595,14,web,0.033,80.60,mobile,new,EU
+homepage_ecom_0079,Category Banner,A/B,37000,1110,36500,1241,18,web,0.033,73.40,tablet,returning,LATAM
+search_ecom_0080,Pagination,A/B,21500,645,21000,714,21,web,0.033,78.30,desktop,new,US
+checkout_ecom_0081,Return Policy,A/B,9400,282,9700,330,28,web,0.033,103.80,mobile,returning,EU
+product_ecom_0082,Delivery Info,A/B,12800,384,12500,425,14,web,0.033,90.70,desktop,new,APAC
+cart_ecom_0083,Empty Cart CTA,A/B,11000,330,10700,364,21,web,0.033,86.20,mobile,returning,US
+homepage_ecom_0084,Flash Sale,A/B,46000,1380,45500,1547,14,web,0.033,69.90,tablet,new,EU
+search_ecom_0085,Grid View,A/B,23000,690,22500,765,18,web,0.033,76.10,desktop,returning,LATAM
+checkout_ecom_0086,Save Card,A/B,7800,234,8100,275,14,web,0.033,117.20,mobile,new,US
+product_ecom_0087,Share Button,A/B,9600,288,9300,316,21,web,0.033,94.50,desktop,returning,EU
+cart_ecom_0088,Related Items,A/B,14500,435,14200,483,28,web,0.033,81.30,mobile,new,APAC
+homepage_ecom_0089,Store Locator,A/B,33000,990,32500,1105,14,web,0.033,75.20,tablet,returning,US
+search_ecom_0090,List View,A/B,25500,765,25000,850,21,web,0.033,77.80,desktop,new,EU
+checkout_ecom_0091,Confirmation,A/B,6600,198,6900,234,14,web,0.033,124.70,mobile,returning,LATAM
+product_ecom_0092,Notify Stock,A/B,8000,240,7800,265,18,web,0.033,100.40,desktop,new,US
+cart_ecom_0093,Promo Slider,A/B,17800,534,17300,588,21,web,0.033,83.50,mobile,returning,EU
+homepage_ecom_0094,Best Sellers,A/B,40000,1200,39500,1343,14,web,0.033,70.60,tablet,new,APAC
+search_ecom_0095,Quick Filters,A/B,30000,900,29500,1003,28,web,0.033,79.00,desktop,returning,US
+checkout_ecom_0096,Order Review,A/B,10000,300,10300,350,14,web,0.033,99.10,mobile,new,EU
+product_ecom_0097,FAQ Section,A/B,13200,396,12900,439,21,web,0.033,93.20,desktop,returning,LATAM
+cart_ecom_0098,Progress Bar,A/B,19800,594,19300,656,18,web,0.033,82.00,mobile,new,US
+homepage_ecom_0099,Live Chat,A/B,51000,1530,50500,1717,14,web,0.033,67.30,tablet,returning,EU
+search_ecom_0100,Saved Search,A/B,16000,480,15700,534,21,web,0.033,78.50,desktop,new,APAC
