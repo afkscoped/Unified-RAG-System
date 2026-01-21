@@ -1,4 +1,10 @@
-# Advanced RAG System Configuration
+# [ANTIGRAVITY] UNIFIED CONFIGURATION HUB
+# Integrated configuration for Standard RAG, Story Weaver, and Elite Research Mode.
+# Optimized for GTX 1650 (4GB VRAM).
+
+project:
+  name: "Antigravity Unified Intelligence Platform"
+  version: "2.5.0"
 
 model:
   # Embedding model (small, fast, good quality)
@@ -6,17 +12,17 @@ model:
   embedding_dim: 384
   
   # LLM configuration
-  llm_provider: "groq"  # groq | ollama
-  llm_model: "llama-3.1-8b-instant"
+  llm_provider: "groq"
+  llm_model: "llama-3.3-70b-versatile"
   llm_temperature: 0.2
   llm_max_tokens: 2048
   
   # Device settings
-  device: "cpu"  # cuda | cpu (use cpu if CUDA not available)
+  device: null  # null (auto-detect) | "cuda" | "cpu"
   use_fp16: true
-  
+
 search:
-  # Chunking
+  # Chunking (Legacy/Standard)
   chunk_size: 1000
   chunk_overlap: 200
   
@@ -30,40 +36,68 @@ search:
   
   # RRF fusion parameter
   rrf_k: 60
-  
+
+preprocessing:
+  layout_aware: true
+  chunking:
+    method: "semantic" # semantic | recursive
+    semantic_threshold: 0.85
+    max_chunk_size: 1000
+  enrichment:
+    ner_enabled: true
+    topic_modeling: true
+
+retrieval:
+  multi_vector:
+    hyde_enabled: true
+    colbert_enabled: true
+  reranking:
+    model: "cross-encoder/ms-marco-MiniLM-L-6-v2"
+    top_n: 5
+
+finetuning:
+  base_model: "microsoft/Phi-3-mini-4k-instruct"
+  quantization: "4bit"
+  lora:
+    r: 16
+    alpha: 32
+    dropout: 0.05
+    target_modules: ["q_proj", "k_proj", "v_proj", "o_proj"]
+
+evaluation:
+  metrics: ["faithfulness", "answer_relevance", "context_precision"]
+
+optimization:
+  memory:
+    vram_cap_gb: 3.3
+  cache:
+    l1_enabled: true
+    l2_enabled: true
+  rate_limit: 5
+
 cache:
   enabled: true
   similarity_threshold: 0.95
   max_items: 100
   ttl_seconds: 3600
-  
+
 memory:
-  # RAM limits (16GB system, use max 12GB)
   max_ram_gb: 12.0
-  ram_cleanup_threshold: 0.80
-  
-  # VRAM limits (6GB GPU, use max 4.8GB = 80%)
-  max_vram_gb: 4.8
-  vram_cleanup_threshold: 0.85
-  
-  # Batch processing
-  embedding_batch_size: 32
-  
-logging:
-  level: "INFO"
-  format: "{time} | {level} | {message}"
-  
+  max_vram_gb: 3.8
+  embedding_batch_size: 16
+
 paths:
   documents: "data/documents"
   embeddings: "data/embeddings"
   cache: "data/cache"
   graphs: "data/graphs"
-  exports: "data/exports"
+  finetuning: "data/finetuning"
+  logs: "logs"
 
 # Story Mode Configuration
 story:
-  mode: "dual"  # "document_only", "story_only", "dual"
-  
+  mode: "dual"
+
 # Graph RAG Configuration
 graph_rag:
   enable_graph: true
@@ -77,6 +111,7 @@ graph_rag:
       - CHARACTER
       - LOCATION
       - EVENT
+      - THEME
       - THEME
       - ARTIFACT
       - FACTION

@@ -60,7 +60,10 @@ class EmbeddingManager:
         self.use_fp16 = use_fp16
         
         # Auto-detect device
-        if device is None:
+        if device == "cuda" and not torch.cuda.is_available():
+            logger.warning("CUDA requested but not available or Torch not compiled with CUDA. Falling back to CPU.")
+            self.device = "cpu"
+        elif device is None:
             self.device = "cuda" if torch.cuda.is_available() else "cpu"
         else:
             self.device = device
