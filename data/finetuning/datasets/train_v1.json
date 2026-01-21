@@ -1,0 +1,12 @@
+[
+    {
+        "instruction": "Identify the main topic of Segment 1",
+        "input": "LEARNING OBJECTIVES",
+        "output": "The main topic of Segment 1 is related to educational goals or outcomes, specifically learning objectives."
+    },
+    {
+        "instruction": "Explain the purpose of listing learning objectives",
+        "input": "1.",
+        "output": "The purpose of listing learning objectives, as seen in Segment 1, is to outline the specific skills, knowledge, or attitudes that learners are expected to acquire or demonstrate after completing a particular course, lesson, or educational program."
+    }
+]

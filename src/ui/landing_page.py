@@ -1,3 +1,4 @@
+# RELOAD_FORCE: 2026-01-21 22:36
 """
 StoryWeaver Landing Page
 
@@ -73,22 +74,21 @@ st.markdown("""
 
 st.divider()
 
-# Two-column mode selection
-col1, col2 = st.columns(2)
+# Three-column mode selection
+col1, col2, col3 = st.columns(3)
 
 with col1:
     st.markdown("### 📚 Document Analyzer")
     st.markdown("""
     **Unified RAG System**
     
-    Analyze and query your documents using our advanced hybrid retrieval system.
+    Standard hybrid search for general document analysis.
     """)
     
     st.markdown("""
-    - 🔍 **Hybrid Search**: BM25 + FAISS semantic search
-    - 💾 **Semantic Caching**: Fast response for similar queries
-    - ⚖️ **Adaptive Weights**: Auto-adjusts based on feedback
-    - 💬 **Interactive Q&A**: Chat with your documents
+    - 🔍 **Hybrid Search**
+    - 💾 **Semantic Caching**
+    - ⚖️ **Adaptive Weights**
     """)
     
     st.markdown("")
@@ -96,18 +96,36 @@ with col1:
         st.switch_page("pages/document_app.py")
 
 with col2:
-    st.markdown("### ✍️ Story Mode")
+    st.markdown("### 🧬 Elite Research Mode")
     st.markdown("""
-    **Comparative Story Generation**
+    **Advanced Intelligence Hub**
     
-    Generate stories using three approaches and compare results side-by-side.
+    Research-grade RAG with Chain-of-Thought and QLoRA labs.
     """)
     
     st.markdown("""
-    - 🆚 **Graph RAG vs Unified RAG**: Direct comparison
-    - 👥 **Character Tracking**: Consistency across chapters
-    - 🕸️ **Relationship Graphs**: Multi-hop discovery
-    - ⚡ **Hybrid Fusion**: Best of both worlds
+    - 🧠 **Adaptive CoT Reasoning**
+    - 🔗 **Grounded Citations**
+    - 🧪 **QLoRA Fine-tuning**
+    - 📊 **Matrix Analytics**
+    """)
+    
+    st.markdown("")
+    if st.button("🔱 Enter Elite Mode", key="elite_btn", use_container_width=True):
+        st.switch_page("pages/elite_app.py")
+
+with col3:
+    st.markdown("### 🎭 Story Mode")
+    st.markdown("""
+    **Narrative Generation**
+    
+    Generate stories using Graph RAG and comparison engines.
+    """)
+    
+    st.markdown("""
+    - 🆚 **Graph vs Unified RAG**
+    - 👥 **Character Tracking**
+    - 🕸️ **Relationship Graphs**
     """)
     
     st.markdown("")

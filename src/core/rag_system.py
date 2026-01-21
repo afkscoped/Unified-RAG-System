@@ -40,7 +40,7 @@ class RAGConfig:
     # Model settings
     embedding_model: str = "BAAI/bge-small-en-v1.5"
     llm_provider: str = "groq"
-    llm_model: str = "llama-3.1-8b-instant"
+    llm_model: str = "llama-3.3-70b-versatile"
     llm_temperature: float = 0.2
     
     # Device settings
@@ -177,18 +177,28 @@ Be concise and accurate in your responses."""
             "queries": 0,
             "cache_hits": 0,
             "documents_ingested": 0,
-            "chunks_created": 0
+            "chunks_created": 0,
+            "index_path": os.path.join("data", "index")
         }
+        
+        # Auto-load existing index
+        if os.path.exists(self.metrics["index_path"]):
+            try:
+                self.load_index(self.metrics["index_path"])
+                logger.info("Auto-loaded existing index")
+            except Exception as e:
+                logger.warning(f"Auto-load failed: {e}")
         
         logger.info("RAG System initialized")
         self.memory_monitor.log_status()
         
-    def ingest_file(self, file_path: str) -> int:
+    def ingest_file(self, file_path: str, original_name: Optional[str] = None) -> int:
         """
         Ingest a single file.
         
         Args:
             file_path: Path to file (PDF, TXT, DOCX)
+            original_name: Optional original filename for display
             
         Returns:
             Number of chunks created
@@ -196,7 +206,8 @@ Be concise and accurate in your responses."""
         path = Path(file_path)
         ext = path.suffix.lower()
         
-        logger.info(f"Ingesting: {path.name}")
+        display_name = original_name or path.name
+        logger.info(f"Ingesting: {display_name}")
         
         # Select loader
         if ext == ".pdf":
@@ -214,7 +225,7 @@ Be concise and accurate in your responses."""
         
         # Add metadata
         for chunk in chunks:
-            chunk.metadata["source_file"] = path.name
+            chunk.metadata["source_file"] = display_name
             
         self.documents.extend(chunks)
         self.metrics["documents_ingested"] += 1
@@ -275,14 +286,21 @@ Be concise and accurate in your responses."""
         self.search_engine.build_indices(self.documents)
         self._indexed = True
         
+        # Auto-save after build
+        try:
+            self.save_index(self.metrics["index_path"])
+        except Exception as e:
+            logger.error(f"Auto-save failed: {e}")
+            
         self.memory_monitor.check_and_cleanup()
-        logger.info("Index built successfully")
+        logger.info("Index built and auto-saved successfully")
     
     def query(
         self,
         question: str,
         top_k: Optional[int] = None,
-        use_cache: bool = True
+        use_cache: bool = True,
+        generate_answer: bool = True
     ) -> QueryResult:
         """
         Query the RAG system.
@@ -291,6 +309,7 @@ Be concise and accurate in your responses."""
             question: User question
             top_k: Number of sources to retrieve
             use_cache: Whether to use semantic cache
+            generate_answer: Whether to generate an LLM response
             
         Returns:
             QueryResult with answer and sources
@@ -327,14 +346,10 @@ Be concise and accurate in your responses."""
             lexical_weight=lex_weight
         )
         
-        # Build context
-        context = "\n\n---\n\n".join([
-            f"Source {i+1}:\n{src.content}"
-            for i, src in enumerate(sources)
-        ])
-        
         # Generate response
-        prompt = f"""Context:
+        answer = ""
+        if generate_answer:
+            prompt = f"""Context:
 {context}
 
 ---
@@ -343,14 +358,16 @@ Question: {question}
 
 Please provide a clear and accurate answer based on the context above."""
 
-        answer = self.llm_router.generate(
-            prompt=prompt,
-            system_prompt=self.DEFAULT_SYSTEM_PROMPT
-        )
-        
-        # Cache response
-        if self.semantic_cache:
-            self.semantic_cache.set(question, query_embedding, answer)
+            answer = self.llm_router.generate(
+                prompt=prompt,
+                system_prompt=self.DEFAULT_SYSTEM_PROMPT
+            )
+            
+            # Cache response
+            if self.semantic_cache:
+                self.semantic_cache.set(question, query_embedding, answer)
+        else:
+            logger.debug("Bypassing answer generation")
         
         # Periodic memory cleanup
         if self.metrics["queries"] % 10 == 0:
@@ -388,6 +405,15 @@ Please provide a clear and accurate answer based on the context above."""
         self.weight_manager.record_feedback(question, float(rating), sem_weight)
         logger.debug(f"Feedback recorded: rating={rating}")
     
+    def get_corpus_data(self) -> Dict[str, Any]:
+        """
+        Retrieves all ingested text chunks for dataset generation.
+        """
+        return {
+            "texts": [doc.page_content for doc in self.documents],
+            "metadata": [doc.metadata for doc in self.documents]
+        }
+
     def get_metrics(self) -> Dict[str, Any]:
         """Get system metrics."""
         cache_stats = self.semantic_cache.get_stats() if self.semantic_cache else {}
@@ -402,11 +428,19 @@ Please provide a clear and accurate answer based on the context above."""
         }
     
     def save_index(self, path: str):
-        """Save FAISS index to disk."""
-        self.search_engine.save_faiss(path)
+        """Save indices to disk."""
+        self.search_engine.save(path)
         
     def load_index(self, path: str):
-        """Load FAISS index from disk."""
-        self.search_engine.load_faiss(path)
-        self._indexed = True
+        """Load indices from disk."""
+        if self.search_engine.load(path):
+            self._indexed = True
+            # Sync documents back to RAG system
+            self.documents = self.search_engine.documents
+            # Update metrics to reflect loaded state
+            self.metrics["chunks_created"] = len(self.documents)
+            # Extrapolate unique docs from metadata if possible
+            unique_docs = len(set(d.metadata.get("source_file", "") for d in self.documents))
+            self.metrics["documents_ingested"] = unique_docs
+            logger.info(f"Synchronized metrics: {unique_docs} docs, {len(self.documents)} chunks")
 

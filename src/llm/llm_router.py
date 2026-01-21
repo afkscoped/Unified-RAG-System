@@ -31,7 +31,7 @@ class LLMRouter:
     def __init__(
         self,
         primary_provider: str = "groq",
-        groq_model: str = "llama-3.1-8b-instant",
+        groq_model: str = "llama-3.3-70b-versatile",
         ollama_model: str = "llama3",
         temperature: float = 0.2,
         max_tokens: int = 2048,

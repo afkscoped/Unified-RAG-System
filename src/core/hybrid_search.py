@@ -60,6 +60,7 @@ class HybridSearchEngine:
         self.faiss_store: Optional[FAISS] = None
         
         self._indexed = False
+        self.index_dir = None
         
     def build_indices(self, documents: List[Document]):
         """
@@ -211,19 +212,70 @@ class HybridSearchEngine:
         logger.debug(f"Hybrid search returned {len(results)} results")
         return results
     
-    def save_faiss(self, path: str):
-        """Save FAISS index to disk."""
-        if self.faiss_store:
-            self.faiss_store.save_local(path)
-            logger.info(f"FAISS index saved to {path}")
+    def save(self, directory: str):
+        """Saves all indices and metadata to disk."""
+        import pickle
+        import os
+        if not os.path.exists(directory):
+            os.makedirs(directory)
             
-    def load_faiss(self, path: str):
-        """Load FAISS index from disk."""
+        # 1. Save FAISS
+        self.faiss_store.save_local(directory)
+        
+        # 2. Save BM25 and Documents
+        metadata = {
+            "documents": self.documents,
+            "bm25": self.bm25,
+            "indexed": self._indexed
+        }
+        with open(os.path.join(directory, "metadata.pkl"), "wb") as f:
+            pickle.dump(metadata, f)
+            
+        logger.info(f"Hybrid indices saved to {directory}")
+
+    def load(self, directory: str):
+        """Loads all indices and metadata from disk."""
+        import pickle
+        import os
+        
+        if not os.path.exists(directory):
+            logger.warning(f"Index directory {directory} not found")
+            return False
+            
+        # 1. Load FAISS
         self.faiss_store = FAISS.load_local(
-            path,
+            directory,
             self.embedding_manager.as_langchain,
             allow_dangerous_deserialization=True
         )
-        logger.info(f"FAISS index loaded from {path}")
+        
+        # 2. Load BM25 and Documents
+        meta_path = os.path.join(directory, "metadata.pkl")
+        if os.path.exists(meta_path):
+            with open(meta_path, "rb") as f:
+                metadata = pickle.load(f)
+                self.documents = metadata.get("documents", [])
+                self.bm25 = metadata.get("bm25")
+                self._indexed = metadata.get("indexed", True)
+                
+        logger.info(f"Hybrid indices loaded from {directory} ({len(self.documents)} docs)")
+        return True
+
+    def get_all_embeddings(self) -> np.ndarray:
+        """Get raw embeddings from FAISS store."""
+        if not self.faiss_store:
+            return np.array([])
+        # LangChain FAISS stores vectors in self.faiss_store.index
+        # Get all vectors from index
+        ntotal = self.faiss_store.index.ntotal
+        return self.faiss_store.index.reconstruct_n(0, ntotal)
+
+    def get_all_texts(self) -> List[str]:
+        """Get all document texts."""
+        return [doc.page_content for doc in self.documents]
+
+    def get_all_sources(self) -> List[str]:
+        """Get all document sources."""
+        return [doc.metadata.get('source_file', 'unknown') for doc in self.documents]
 
 
