@@ -1,13 +1,8 @@
 # 🤖 Unified RAG System + StoryWeaver & QLoRA Studio
 
-A production-ready Retrieval-Augmented Generation platform with a **High-Tech / Cyberpunk** aesthetic. Optimized for consumer hardware (16GB RAM + 6GB VRAM).
+A production-ready Retrieval-Augmented Generation platform optimized for consumer hardware (16GB RAM + 6GB VRAM).
 
 ## ✨ Features
-
-### 🎨 Cyberpunk / Glitch UI
-- **Neon Glitch Aesthetic**: A dark, high-contrast "High-Tech, Low-Life" design system.
-- **Interactive HUD**: Landing page with "Cyber Cards" and glitch hover effects.
-- **Scanline Overlays**: CRT-monitor texture for an immersive terminal feel.
 
 ### 🧬 QLoRA Training Studio
 - **Fine-Tune LLMs Locally**: Complete QLoRA fine-tuning pipeline for consumer GPUs.
