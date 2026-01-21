@@ -1,0 +1,13 @@
+experiment_name,control_visitors,control_conversions,variant_visitors,variant_conversions
+promo_test_001,16377,769,17095,975
+ad_test_002,18747,1185,17790,1152
+campaign_test_003,23461,1540,25100,1765
+ad_test_004,17972,463,18442,494
+email_blast_test_005,10981,580,11405,600
+ad_test_006,9747,318,9738,361
+email_blast_test_007,9534,709,9879,766
+ad_test_008,18495,1392,17810,1245
+social_test_009,3863,143,3845,149
+email_blast_test_010,4997,196,4715,233
+email_blast_test_011,12911,262,13057,312
+campaign_test_012,48988,3608,47693,3015

@@ -1,0 +1,21 @@
+experiment_name,control_visitors,control_conversions,variant_visitors,variant_conversions
+New Feature Discovery_Exp_1,3620,1086,2615,851
+New Feature Discovery_Exp_2,3619,1088,1241,366
+New Feature Discovery_Exp_3,2191,643,4076,1241
+New Feature Discovery_Exp_4,1408,397,1952,624
+New Feature Discovery_Exp_5,1569,488,2397,785
+New Feature Discovery_Exp_6,2627,837,2595,772
+New Feature Discovery_Exp_7,2997,894,3504,1130
+New Feature Discovery_Exp_8,1981,560,3274,993
+New Feature Discovery_Exp_9,1235,349,1981,632
+New Feature Discovery_Exp_10,4598,1388,2138,668
+New Feature Discovery_Exp_11,3281,1005,1194,385
+New Feature Discovery_Exp_12,2695,823,4531,1393
+New Feature Discovery_Exp_13,1314,408,4191,1336
+New Feature Discovery_Exp_14,4211,1297,1076,318
+New Feature Discovery_Exp_15,1280,363,1681,497
+New Feature Discovery_Exp_16,4454,1327,1871,608
+New Feature Discovery_Exp_17,2930,849,4687,1529
+New Feature Discovery_Exp_18,4416,1328,4929,1556
+New Feature Discovery_Exp_19,2850,918,1566,504
+New Feature Discovery_Exp_20,3759,1088,3275,1039

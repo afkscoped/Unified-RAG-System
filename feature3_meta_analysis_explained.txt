@@ -1,0 +1,235 @@
+Feature 3: A/B Test Meta-Analysis Engine - Beginner's Guide
+=============================================================
+
+This document provides a simple, non-technical explanation of the A/B Test Meta-Analysis Engine. You don't need a degree in statistics to understand how this tool helps you make better decisions.
+
+Table of Contents
+-----------------
+1. Overview of Feature 3
+2. All Modes in the Sidebar
+3. MCP Server Integration
+4. What Happens Internally
+5. All Graphs and What They Mean
+6. All Statistics Explained Simply
+7. Simple View Mode
+8. End-to-End Example
+
+=============================================================
+1. Overview of Feature 3
+=============================================================
+
+What is A/B Testing?
+--------------------
+Imagine you have a website and you want to know if a green "Buy" button works better than a red one. You show the green button to half your visitors and the red button to the other half. This is an A/B test: a controlled experiment to see which version performs better.
+
+What is Meta-Analysis?
+----------------------
+Sometimes, one test isn't enough. Maybe you ran the test in January, February, and March. Or maybe you ran it in the US, UK, and Japan. A "Meta-Analysis" is a "super-study" that combines the results of all these separate experiments into one single, powerful conclusion.
+
+Why combine experiments?
+------------------------
+- **More Accuracy:** Combining 5 small tests is like running one huge test.
+- **Find the Truth:** One test might be a fluke. If 4 out of 5 tests say the green button is better, you can be much more confident.
+- **Spot Differences:** It helps you see if the button works in the US but fails in Japan.
+
+What problems does this feature solve?
+--------------------------------------
+Instead of looking at ten different Excel sheets and guessing the winner, this tool mathematically combines them to give you a single "Global Winner" and tells you how confident you should be.
+
+=============================================================
+2. All Modes in the Sidebar
+=============================================================
+
+This tool allows you to bring in data in four different ways.
+
+📁 Upload Files
+---------------
+- **What it does:** Allows you to upload your own experiment data.
+- **Supported Formats:** .csv (Comma Separated Values) and .xlsx (Excel).
+- **Checks:** The system automatically checks if your file has the required columns (like "Users", "Conversions", "Control", "Variant").
+- **What happens next:** Once uploaded, the file is cleaned and prepared for analysis immediately.
+
+🧪 Synthesize Data
+------------------
+- **What it does:** Generates "fake" but realistic experiment data for testing purposes.
+- **Synthetic Data:** Think of this as a flight simulator. It's not a real plane, but it acts exactly like one.
+- **CTGAN & CopulaGAN:** These are advanced AI models. Imagine an artist (AI) who studies a painting (your data rules) and then paints new pictures that look just like the original style.
+  - *CTGAN* is great for general data.
+  - *CopulaGAN* is better when data points are connected (like age and income).
+- **Domains:** You can choose a "theme" like E-commerce (clicks/buys) or Healthcare (patients/cures).
+
+🌐 Import from Kaggle
+---------------------
+- **What it does:** Downloads real-world datasets directly from Kaggle (a popular data science website).
+- **Time:** This might take a few seconds because it's downloading large files from the internet.
+- **Extraction:** The system automatically looks inside the downloaded zip files to find the relevant experiment data (CSVs).
+
+📚 Sample Datasets
+------------------
+- **What it does:** Provides ready-to-use examples if you don't have any data yet.
+- **When to use:** Use this when you are first learning the tool and want to see how the graphs and statistics should look.
+
+=============================================================
+3. MCP Server Integration
+=============================================================
+
+What is an MCP Server?
+----------------------
+Think of the MCP (Model Context Protocol) Server as a "Universal Translator."
+
+Why does data flow through it?
+------------------------------
+Your data might come from an Excel file, a generated simulation, or a Kaggle download. All these sources speak different languages. The MCP Server acts as a funnel that translates everything into one standard format that the analysis engine understands.
+
+- **The MCP Badge:** When you see the "MCP Connected" badge, it means the translator is turned on and listening.
+- **Activity Panel:** This is a log (like a receipt) showing every time data was sent, translated, and received.
+
+=============================================================
+4. What Happens Internally (Simple Explanation)
+=============================================================
+
+1. **Data Harmonization (Translation):**
+   The system renames columns so "Clicks" in one file and "Events" in another file both mean the same thing.
+
+2. **Effect Size Calculation (The Score):**
+   It calculates a score for each experiment.
+   - Positive score = Variant (change) won.
+   - Negative score = Control (original) won.
+
+3. **Standard Error (The Uncertainty):**
+   It calculates how "wobbly" the result is. Small experiments are wobblier (higher error) than huge experiments.
+
+4. **Weighting (Trust):**
+   The system trusts larger experiments with less wobble more than tiny, uncertain ones. It gives "heavier" voting power to better data.
+
+5. **Bias Detection (Fairness Check):**
+   It assumes that for every positive fluke, there should be a negative fluke. If it only sees positive results, it suspects someone is hiding the failed tests (this is called Publication Bias).
+
+6. **RAG Interpretation (The AI Explainer):**
+   Finally, an AI reads all the complex math and translates it into the English summaries you see on the screen.
+
+=============================================================
+5. All Graphs and What They Mean
+=============================================================
+
+Forest Plot (The Tree of Truth)
+-------------------------------
+- **Rows:** Each horizontal line is one experiment.
+- **The Box:** The center of the box is the result.
+- **The Lines (Whiskers):** The width of the line is the uncertainty. Wide line = not sure. Short line = very sure.
+- **The Diamond:** This is the most important part. It sits at the bottom. It represents the *combined* result of everything.
+- **Interpretation:**
+  - If the diamond makes not touch the center vertical line, the result is statistically significant (real).
+  - Right of center = Variant Wins.
+  - Left of center = Control Wins.
+
+Funnel Plot (The Triangle of Fairness)
+--------------------------------------
+- **Shape:** Imagine an upside-down funnel.
+- **Dots:** Each dot is an experiment. Big precise studies sit at the top, small noisy ones at the bottom.
+- **Symmetry:** You want the dots to look like a balanced Christmas tree.
+- **Bias:** If one side of the tree is empty, it means biased data (e.g., failed experiments were deleted).
+
+Heterogeneity Plot
+------------------
+- **What it shows:** How much the experiments disagree with each other.
+- **Interpretation:** If the dots are all over the place, it means your experiments are very different (High Heterogeneity). If they are close together, they are consistent.
+
+Bar Charts
+----------
+- **Simple View:** A direct look at raw numbers.
+- **Interpretation:** If the "Variant" bar is significantly higher than the "Control" bar, the new version performed better in raw numbers.
+
+=============================================================
+6. All Statistics Explained Simply
+=============================================================
+
+Effect Size
+-----------
+- **What it is:** The magnitude of the heavy lifting.
+- **Interpretation:** A generic "Standardized Mean Difference". 0.2 is small, 0.5 is medium, 0.8 is huge.
+
+Standard Error (SE)
+-------------------
+- **What it is:** The margin of error.
+- **Interpretation:** Lower is better. It means we are pinpoint precise.
+
+Fixed-Effects Model
+-------------------
+- **The Assumpion:** "All these experiments are measuring the Exact Same Thing."
+- **When to use:** When experiments are identical (same website, same time, same people).
+
+Random-Effects Model (Default)
+------------------------------
+- **The Assumption:** "These experiments are similar, but different." (e.g., different countries).
+- **When to use:** Most of the time. It is safer because it accepts that the real world varies.
+
+I² (Heterogeneity)
+------------------
+- **What it is:** The "Disagreement Score."
+- **0%:** Perfect agreement. All experiments tell the same story.
+- **50%:** Moderate disagreement.
+- **75%+:** High disagreement. The experiments might be too different to combine safely.
+
+τ² (Tau-Squared)
+----------------
+- **What it is:** The actual amount of variance between studies.
+- **Note:** If Tau-squared is zero, the Fixed and Random models will give the same answer.
+
+Q Statistic
+-----------
+- **What it is:** A math test to check if the disagreement (I²) is real or just random noise.
+
+Egger’s Test
+------------
+- **What it is:** A mathematical "Lie Detector" for the Funnel Plot.
+- **Interpretation:** If the p-value is low, it warns that the data might be biased (missing studies).
+
+Trim-and-Fill
+-------------
+- **What it is:** The "Repair Man."
+- **Function:** If it detects bias (missing studies), it creates "ghost studies" to fill the empty gaps and re-calculates the result to see if the winner changes.
+
+Simpson’s Paradox Detector
+--------------------------
+- **The Paradox:** A weird math trap where Option A wins in every single city individually, but when you add them all up, Option B wins overall.
+- **Detector:** The system checks for this trap. If it beeps, do not trust the combined average! Look at the individual groups instead.
+
+=============================================================
+7. Simple View Mode
+=============================================================
+
+If the graphs are too confusing, click "Simple View."
+
+- **"Did the variant win?"**
+  - **Yes (Green):** The new version is statistically better.
+  - **No (Red):** The new version is worse or the same.
+  - **Inconclusive (Yellow):** We don't have enough data to be sure.
+
+- **Summary Paragraph:**
+  A plain English sentence generated by the system telling you exactly what to do (e.g., "Implement the Green Button").
+
+- **Why use this?**
+  It strips away the math and just gives you the bottom line decision.
+
+=============================================================
+8. End-to-End Example
+=============================================================
+
+Step 1: Upload
+You have 3 Excel files from tests in London, New York, and Tokyo. You upload them using "Upload Files."
+
+Step 2: Run Analysis
+You click "Analyze." The MCP server processes the files.
+
+Step 3: Check Simple View
+You see a Green Box saying "Yes." The summary says, "The Variant increased conversion by roughly 5%."
+
+Step 4: Check Forest Plot (Verification)
+You switch to the "Advanced" tab. You look at the Forest Plot. The diamond is to the right of the line. This confirms the win.
+
+Step 5: Check Heterogeneity
+You see I² is 40%. The experiments in London, NY, and Tokyo were slightly different, but consistent enough to trust the result.
+
+Step 6: Conclusion
+"The new feature is a winner globally. Deployment recommended."

@@ -1,0 +1,9 @@
+experiment_name,control_visitors,control_conversions,variant_visitors,variant_conversions
+copy_test_001,962,183,1031,189
+layout_test_002,903,127,860,127
+flow_test_003,7461,1326,7346,1429
+layout_test_004,9759,1850,10417,2051
+layout_test_005,5085,1100,4957,1125
+button_test_006,8213,1928,7783,1865
+button_test_007,3366,499,3541,538
+layout_test_008,1094,163,1083,213

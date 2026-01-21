@@ -1,0 +1,51 @@
+experiment_id,experiment_name,variant,control_visitors,control_conversions,variant_visitors,variant_conversions,test_duration_days,platform,completion_rate,assessment_score,learning_style,subject_area,difficulty_level
+lesson_edtech_0001,Video Lecture Format,A/B,3500,2100,3600,2376,30,web,0.60,75.0,visual,science,intermediate
+quiz_edtech_0002,Gamified Quiz,A/B,2800,1960,2900,2146,14,app,0.70,82.5,kinesthetic,math,beginner
+content_edtech_0003,Interactive Text,A/B,4200,2520,4100,2772,45,web,0.60,78.0,visual,language,advanced
+gamification_edtech_0004,Leaderboard,A/B,5000,3500,5100,3850,30,app,0.70,80.0,kinesthetic,science,intermediate
+feedback_edtech_0005,Instant Feedback,A/B,3000,1800,3100,2070,21,web,0.60,85.0,auditory,math,beginner
+lesson_edtech_0006,Micro-learning,A/B,2500,1750,2600,1925,14,app,0.70,76.5,visual,arts,intermediate
+quiz_edtech_0007,Spaced Repetition,A/B,3800,2660,3900,2926,60,app,0.70,88.0,visual,language,advanced
+content_edtech_0008,Audio Summaries,A/B,1500,750,1600,880,30,app,0.50,72.0,auditory,history,intermediate
+gamification_edtech_0009,Badges System,A/B,4500,3150,4600,3465,45,web,0.70,79.0,kinesthetic,science,beginner
+feedback_edtech_0010,Peer Review,A/B,2200,1100,2300,1265,30,web,0.50,81.0,visual,arts,advanced
+lesson_edtech_0011,Live Session,A/B,1200,840,1150,885,14,web,0.70,84.0,auditory,math,advanced
+quiz_edtech_0012,Adaptive Difficulty,A/B,3200,2240,3300,2464,45,app,0.70,86.5,kinesthetic,language,intermediate
+content_edtech_0013,PDF Downloads,A/B,1800,900,1900,990,21,web,0.50,74.0,visual,science,beginner
+gamification_edtech_0014,Daily Streak,A/B,5500,4125,5600,4480,60,app,0.75,80.5,kinesthetic,math,intermediate
+feedback_edtech_0015,Video Comments,A/B,1600,800,1700,935,30,app,0.50,77.5,visual,arts,beginner
+lesson_edtech_0016,Project Based,A/B,900,540,950,627,45,web,0.60,89.0,kinesthetic,science,advanced
+quiz_edtech_0017,Practice Mode,A/B,2600,1560,2700,1755,21,app,0.60,83.0,visual,math,intermediate
+content_edtech_0018,Forum Integration,A/B,3400,1360,3500,1540,60,web,0.40,76.0,auditory,language,beginner
+gamification_edtech_0019,Avatar Custom,A/B,4000,2400,4100,2640,30,app,0.60,79.5,visual,arts,intermediate
+feedback_edtech_0020,Progress Report,A/B,3600,2520,3700,2772,45,web,0.70,82.0,visual,math,advanced
+lesson_edtech_0021,Storytelling,A/B,2000,1200,2100,1380,30,app,0.60,78.5,auditory,history,beginner
+quiz_edtech_0022,Timed Challenges,A/B,2900,1740,3000,1914,14,app,0.60,81.5,kinesthetic,science,intermediate
+content_edtech_0023,Dark Mode,A/B,4800,2880,4900,3024,30,app,0.60,75.5,visual,language,intermediate
+gamification_edtech_0024,Team Quests,A/B,1400,840,1500,975,45,web,0.60,84.5,kinesthetic,math,advanced
+feedback_edtech_0025,Rubric View,A/B,1100,660,1150,726,21,web,0.60,80.0,visual,arts,beginner
+lesson_edtech_0026,Case Studies,A/B,1300,780,1350,891,30,web,0.60,87.0,visual,science,advanced
+quiz_edtech_0027,Audio Questions,A/B,1700,1020,1800,1170,14,app,0.60,79.0,auditory,language,beginner
+content_edtech_0028,Transcript View,A/B,2400,1200,2500,1320,30,web,0.50,76.5,visual,math,intermediate
+gamification_edtech_0029,Points Store,A/B,3900,2730,4000,3003,60,app,0.70,81.0,kinesthetic,history,beginner
+feedback_edtech_0030,Hint System,A/B,3100,2170,3200,2336,21,app,0.70,85.5,visual,science,intermediate
+lesson_edtech_0031,VR Simulation,A/B,500,300,520,345,45,vr,0.60,90.0,kinesthetic,science,advanced
+quiz_edtech_0032,Flashcards,A/B,3300,2310,3400,2541,30,app,0.70,83.5,visual,language,beginner
+content_edtech_0033,Wiki Links,A/B,2100,840,2200,924,21,web,0.40,74.5,visual,history,intermediate
+gamification_edtech_0034,Level Up,A/B,4300,3010,4400,3311,45,app,0.70,80.0,kinesthetic,math,beginner
+feedback_edtech_0035,Mentor Chat,A/B,800,480,850,561,60,web,0.60,88.5,auditory,arts,advanced
+lesson_edtech_0036,Guest Speaker,A/B,1000,600,1050,660,14,web,0.60,82.5,auditory,science,intermediate
+quiz_edtech_0037,Fill in Blanks,A/B,2700,1620,2800,1782,21,app,0.60,78.0,visual,language,beginner
+content_edtech_0038,Infographics,A/B,3700,2220,3800,2442,30,web,0.60,81.5,visual,math,intermediate
+gamification_edtech_0039,Secret Levels,A/B,2300,1610,2400,1764,45,app,0.70,84.0,kinesthetic,arts,beginner
+feedback_edtech_0040,Performance Graph,A/B,3500,2450,3600,2695,30,web,0.70,83.0,visual,science,advanced
+lesson_edtech_0041,Bite-sized,A/B,4100,2870,4200,3148,14,app,0.70,80.5,visual,language,intermediate
+quiz_edtech_0042,Exam Simulator,A/B,1900,950,2000,1090,60,web,0.50,86.0,kinesthetic,math,advanced
+content_edtech_0043,Searchable Trans,A/B,1450,725,1500,810,21,web,0.50,77.0,visual,history,intermediate
+gamification_edtech_0044,Daily Challenge,A/B,4600,3220,4700,3519,30,app,0.70,82.5,kinesthetic,science,beginner
+feedback_edtech_0045,Email Report,A/B,3000,1200,3100,1320,30,email,0.40,76.5,visual,arts,intermediate
+lesson_edtech_0046,Expert QA,A/B,950,570,1000,630,14,web,0.60,85.0,auditory,math,advanced
+quiz_edtech_0047,Multiple Choice,A/B,3600,2520,3700,2664,21,app,0.70,79.5,visual,language,beginner
+content_edtech_0048,Note Taking,A/B,2400,1440,2500,1584,30,app,0.60,81.0,visual,science,intermediate
+gamification_edtech_0049,Progress Map,A/B,2900,2030,3000,2233,45,app,0.70,83.5,kinesthetic,history,intermediate
+feedback_edtech_0050,Success Popups,A/B,4400,3080,4500,3366,30,web,0.70,78.5,visual,math,beginner

@@ -1,0 +1,51 @@
+experiment_id,experiment_name,variant,control_visitors,control_conversions,variant_visitors,variant_conversions,test_duration_days,platform,success_rate,adverse_event_rate,age_group,severity_level,comorbidity_status
+treatment_health_0001,Dosage A vs B,A/B,800,280,820,328,60,clinic,0.35,0.12,35-49,moderate,none
+therapy_health_0002,Physical Therapy Protocol,A/B,450,180,460,207,90,hospital,0.40,0.05,50-64,severe,one
+protocol_health_0003,Post-Op Care Routine,A/B,1200,720,1180,767,45,hospital,0.60,0.08,65+,moderate,multiple
+intervention_health_0004,Dietary Intervention,A/B,600,240,610,274,120,clinic,0.40,0.02,18-34,mild,none
+dosage_health_0005,Standard vs Extended Release,A/B,300,105,310,124,180,clinic,0.35,0.15,50-64,moderate,one
+treatment_health_0006,New Drug Trial Phase 2,A/B,150,60,145,58,365,research,0.40,0.18,35-49,severe,none
+therapy_health_0007,CBT vs Mindfulness,A/B,500,250,520,286,60,clinic,0.50,0.01,18-34,mild,one
+protocol_health_0008,Telehealth Monitoring,A/B,2000,1400,2050,1537,180,remote,0.70,0.03,65+,moderate,multiple
+intervention_health_0009,Exercise Regimen,A/B,850,510,830,539,90,community,0.60,0.04,50-64,mild,one
+dosage_health_0010,Low Dose aspirin,A/B,5000,2500,4950,2574,365,multi-center,0.50,0.06,65+,mild,multiple
+treatment_health_0011,Immunotherapy Protocol,A/B,200,80,210,95,180,hospital,0.40,0.20,50-64,severe,none
+therapy_health_0012,Speech Therapy App,A/B,300,120,320,144,90,remote,0.40,0.00,18-34,moderate,none
+protocol_health_0013,Discharge Instructions,A/B,1500,1050,1550,1162,30,hospital,0.70,0.02,65+,moderate,one
+intervention_health_0014,Smoking Cessation,A/B,1000,250,980,294,365,community,0.25,0.05,35-49,moderate,one
+dosage_health_0015,Pain Management,A/B,650,390,670,435,14,clinic,0.60,0.10,50-64,severe,multiple
+treatment_health_0016,Vaccine Efficacy,A/B,4000,3200,4100,3485,365,multi-center,0.80,0.05,18-34,mild,none
+therapy_health_0017,Group Therapy,A/B,250,100,240,108,120,clinic,0.40,0.02,35-49,moderate,one
+protocol_health_0018,Surgical Checklist,A/B,1800,1620,1850,1720,365,hospital,0.90,0.01,50-64,severe,multiple
+intervention_health_0019,Sleep Hygiene,A/B,700,280,720,324,60,remote,0.40,0.00,18-34,mild,none
+dosage_health_0020,Antibiotic Course,A/B,1100,880,1080,918,10,clinic,0.80,0.08,35-49,moderate,none
+treatment_health_0021,Dermatology Cream,A/B,900,450,920,506,45,clinic,0.50,0.05,18-34,mild,none
+therapy_health_0022,Occupational Therapy,A/B,350,210,360,234,90,center,0.60,0.02,65+,moderate,one
+protocol_health_0023,ER Triage System,A/B,3000,2400,3100,2635,180,hospital,0.80,0.01,all,severe,multiple
+intervention_health_0024,Diabetes Education,A/B,1200,600,1250,687,365,community,0.50,0.00,50-64,moderate,one
+dosage_health_0025,Insulin Pump Settings,A/B,400,240,410,266,120,clinic,0.60,0.05,18-34,severe,one
+treatment_health_0026,Hypertension Drug,A/B,2500,1750,2450,1837,365,multi-center,0.70,0.04,50-64,moderate,multiple
+therapy_health_0027,Music Therapy,A/B,200,80,210,95,60,center,0.40,0.00,65+,severe,multiple
+protocol_health_0028,Hand Hygiene,A/B,5000,4500,5100,4692,365,hospital,0.90,0.00,all,mild,none
+intervention_health_0029,Stress Management,A/B,800,320,820,369,90,remote,0.40,0.00,35-49,moderate,one
+dosage_health_0030,Chemo Schedule,A/B,150,60,160,72,180,hospital,0.40,0.25,50-64,severe,none
+treatment_health_0031,Allergy Shot,A/B,1300,910,1350,1012,365,clinic,0.70,0.03,18-34,moderate,one
+therapy_health_0032,Art Therapy,A/B,180,90,190,105,60,center,0.50,0.00,35-49,mild,one
+protocol_health_0033,Remote Monitoring,A/B,950,665,970,727,180,remote,0.70,0.01,65+,severe,multiple
+intervention_health_0034,Weight Loss App,A/B,2200,660,2300,759,120,remote,0.30,0.00,35-49,moderate,none
+dosage_health_0035,Vitamin D Supplement,A/B,1600,1120,1650,1237,365,community,0.70,0.01,65+,mild,one
+treatment_health_0036,Migraine Prevention,A/B,750,375,760,412,90,clinic,0.50,0.08,35-49,moderate,none
+therapy_health_0037,VR Rehabilitation,A/B,120,60,130,72,45,center,0.50,0.02,18-34,severe,one
+protocol_health_0038,Patient Portal,A/B,3500,2100,3600,2340,365,digital,0.60,0.00,all,mild,none
+intervention_health_0039,Nutritional Counseling,A/B,600,300,620,341,90,clinic,0.50,0.00,50-64,moderate,one
+dosage_health_0040,Iron Supplement,A/B,1400,980,1450,1087,60,community,0.70,0.05,18-34,mild,none
+treatment_health_0041,Acne Treatment,A/B,2000,1200,2050,1332,90,clinic,0.60,0.06,18-34,moderate,none
+therapy_health_0042,Aquatic Therapy,A/B,300,180,310,202,60,center,0.60,0.01,65+,severe,multiple
+protocol_health_0043,Fall Prevention,A/B,1500,900,1550,1007,365,nursing_home,0.60,0.02,65+,moderate,multiple
+intervention_health_0044,Mindful Eating,A/B,800,320,830,373,60,remote,0.40,0.00,35-49,mild,one
+dosage_health_0045,Statins,A/B,2800,1960,2850,2137,365,multi-center,0.70,0.03,50-64,moderate,one
+treatment_health_0046,Probiotic,A/B,1000,500,1050,577,30,community,0.50,0.01,35-49,mild,none
+therapy_health_0047,Pet Therapy,A/B,400,240,420,273,60,nursing_home,0.60,0.00,65+,moderate,multiple
+protocol_health_0048,Emergency Contact,A/B,2500,1750,2600,1950,180,remote,0.70,0.00,65+,severe,one
+intervention_health_0049,Meditation App,A/B,3000,1200,3100,1364,60,digital,0.40,0.00,18-34,mild,none
+dosage_health_0050,Melatonin,A/B,900,540,920,598,30,community,0.60,0.02,35-49,mild,none
